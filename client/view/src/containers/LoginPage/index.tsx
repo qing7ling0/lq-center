@@ -1,16 +1,13 @@
 import React from 'react';
 import { createSelector } from 'reselect';
-import { Dispatch, compose } from 'redux';
-import { connect } from 'react-redux';
+import { Dispatch } from 'redux';
 import { loadHitokoto } from 'containers/HomePage/actions';
 import { makeSelectHitokoto } from 'containers/HomePage/selectors';
 import reducer from './reducer';
 import saga from './saga';
 
-import injectReducer from 'utils/injectReducer';
-import injectSaga from 'utils/injectSaga';
 import { $Call } from 'utility-types';
-import { ONCE_TILL_UNMOUNT } from 'utils/constants';
+import { pageCompose} from 'utils/pageProps';
 
 interface ILoginPageProps {
 }
@@ -24,9 +21,7 @@ export const mapDispatchToProps = (dispatch: Dispatch) => ({
   onGetHitokoto: () => (dispatch(loadHitokoto()))
 });
 
-type stateProps = $Call<typeof mapStateToProps>;
-type dispatchProps = $Call<typeof mapDispatchToProps>;
-type Props = stateProps & ILoginPageProps & dispatchProps;
+type Props = $Call<typeof mapStateToProps> & ILoginPageProps & $Call<typeof mapDispatchToProps>;
 
 export class LoginPage extends React.PureComponent<Props, undefined> {
 
@@ -39,13 +34,9 @@ export class LoginPage extends React.PureComponent<Props, undefined> {
   }
 }
 
-// tslint:disable-next-line:max-line-length
-const withConnect = connect<stateProps, dispatchProps, ILoginPageProps>(mapStateToProps, mapDispatchToProps);
-const withReducer = injectReducer({ key: 'login', reducer });
-const withSaga = injectSaga({ key: 'login', saga, mode: ONCE_TILL_UNMOUNT });
-
-export default compose(
-  withReducer,
-  withSaga,
-  withConnect
-)(LoginPage);
+export default pageCompose<ILoginPageProps>({
+  mapStateToProps,
+  mapDispatchToProps,
+  reducer: {key: 'login', reducer},
+  saga: {key: 'login', saga}
+})(LoginPage);

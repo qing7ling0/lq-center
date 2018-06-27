@@ -11,7 +11,7 @@ import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
 import { makeSelectHitokoto } from 'containers/HomePage/selectors';
 import { $Call } from 'utility-types';
-import { ONCE_TILL_UNMOUNT } from 'utils/constants';
+import { ONCE_TILL_UNMOUNT } from 'constants/constants';
 
 interface IHomePageProps {
 }

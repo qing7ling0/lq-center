@@ -10,7 +10,7 @@ import {
   DAEMON,
   ONCE_TILL_UNMOUNT,
   RESTART_ON_REMOUNT,
-} from '../constants';
+} from '../../constants/constants';
 import { IStore } from '../../Interfaces/store';
 import { $Call } from 'utility-types';
 

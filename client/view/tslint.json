@@ -11,6 +11,7 @@
     "member-access": false,
     "member-ordering": [true, { "order": "fields-first" }],
     "newline-before-return": false,
+    "no-bitwise": false,
     "no-any": false,
     "no-empty-interface": false,
     "no-import-side-effect": [true],
@@ -46,6 +47,7 @@
     "typedef": [true, "property-declaration"],
     "variable-name": [true, "ban-keywords", "check-format", "allow-pascal-case", "allow-leading-underscore"],
     "jsx-no-lambda": false,
-    "jsx-boolean-value" : ["never"]
+    "jsx-boolean-value" : ["never"],
+    "jsx-no-multiline-js": false
   }
 }
