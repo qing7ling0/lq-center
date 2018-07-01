@@ -9,5 +9,5 @@ export interface IReducer {
 export interface ISaga {
   key: string;
   saga: () => IterableIterator<any>;
-  mode?: any
+  mode?: any;
 }

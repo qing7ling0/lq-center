@@ -30,7 +30,6 @@
     "ordered-imports": [false],
     "prefer-method-signature": false,
     "prefer-template": [true, "allow-single-concat"],
-    "quotemark": [true, "single"],
     "semicolon": [true, "always"],
     "trailing-comma": [true, {
       "singleline": "never",

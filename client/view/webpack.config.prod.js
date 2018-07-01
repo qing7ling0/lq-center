@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const OfflinePlugin = require('offline-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
@@ -29,6 +30,9 @@ const NormalExt = new ExtractTextPlugin('[name].[hash:8].css');
 const SassExt = new ExtractTextPlugin('[name].[hash:8].sass.css');
 
 const plugins = [
+	MINExt,
+	NormalExt,
+	SassExt,
 	new OfflinePlugin({}),
 	new HtmlWebpackPlugin(HtmlWebpackConfig)
 ];
@@ -80,6 +84,7 @@ module.exports = {
 			},
 			{
 				test: /(\.min)+\.css$/,
+        exclude: /node_modules/,
 				use: MINExt.extract({
 					use: [{
 							loader: 'css-loader?importLoaders=1'

@@ -31,6 +31,9 @@ module.exports = {
 	devtool: "source-map",
 
 	plugins: [
+		MINExt,
+		NormalExt,
+		SassExt,
 		new HtmlWebpackPlugin(HtmlWebpackConfig)
 	],
 
@@ -73,7 +76,8 @@ module.exports = {
 							}
 						}
 					]
-				})
+				}),
+				exclude: path.resolve(__dirname, "node_modules")
 			},
 			{
 				test: /\.scss$/,
