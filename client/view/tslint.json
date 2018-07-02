@@ -31,6 +31,7 @@
     "prefer-method-signature": false,
     "prefer-template": [true, "allow-single-concat"],
     "semicolon": [true, "always"],
+    "quotemark": [false, "single"],
     "trailing-comma": [true, {
       "singleline": "never",
       "multiline": {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { createSelector } from 'reselect';
 import { Dispatch } from 'redux';
-import { Form } from 'antd';
+import { Form, Input, Icon, Checkbox, Button } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 
 import { loadHitokoto } from 'containers/HomePage/actions';
@@ -12,7 +12,9 @@ import saga from './saga';
 
 import { $Call } from 'utility-types';
 import { pageCompose} from 'utils/pageProps';
-import FormItemComponent from '../../components/form/FormItemComponent';
+// import FormItemComponent from '../../components/form/FormItemComponent';
+
+const FormItem = Form.Item;
 
 interface ILoginPageProps {
   form: Form;
@@ -35,16 +37,16 @@ export class LoginPage extends React.PureComponent<Props, undefined> {
     const { getFieldDecorator } = this.props.form;
     return (
       <Form onSubmit={this.handleSubmit} className="login-form">
-        {/* <FormItem>
+        <FormItem>
           {getFieldDecorator('userName', {
-            rules: [{ required: true, message: 'Please input your username!' }],
+            rules: [{ required: true, message: 'Please input your username!' }]
           })(
             <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
           )}
         </FormItem>
         <FormItem>
           {getFieldDecorator('password', {
-            rules: [{ required: true, message: 'Please input your Password!' }],
+            rules: [{ required: true, message: 'Please input your Password!' }]
           })(
             <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
           )}
@@ -52,7 +54,7 @@ export class LoginPage extends React.PureComponent<Props, undefined> {
         <FormItem>
           {getFieldDecorator('remember', {
             valuePropName: 'checked',
-            initialValue: true,
+            initialValue: true
           })(
             <Checkbox>Remember me</Checkbox>
           )}
@@ -61,7 +63,7 @@ export class LoginPage extends React.PureComponent<Props, undefined> {
             Log in
           </Button>
           Or <a href="">register now!</a>
-        </FormItem> */}
+        </FormItem>
       </Form>
     );
   }
