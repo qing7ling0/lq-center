@@ -2,7 +2,7 @@ import { fromJS } from 'immutable';
 import { $Call, $Values } from 'utility-types';
 import * as actions from './actions';
 import { getType } from 'typesafe-actions';
-export type HomeAction = $Call<$Values<typeof actions>>;
+export type LoginAction = $Call<$Values<typeof actions>>;
 
 const initialState = fromJS({
   loading: false,
@@ -10,7 +10,7 @@ const initialState = fromJS({
   hitokoto: undefined
 });
 
-export default function homeReducer(state = initialState, action: HomeAction) {
+export default function loginReducer(state = initialState, action: LoginAction) {
   switch (action.type) {
     case getType(actions.loadHitokoto):
       return state

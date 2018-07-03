@@ -11,6 +11,7 @@
     "member-access": false,
     "member-ordering": [true, { "order": "fields-first" }],
     "newline-before-return": false,
+    "no-console": false,
     "no-bitwise": false,
     "no-any": false,
     "no-empty-interface": false,

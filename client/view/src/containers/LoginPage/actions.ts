@@ -1,4 +1,4 @@
-import { LOAD_HITOKOTO, LOAD_HITOKOTO_SUCCESS, LOAD_HITOKOTO_ERROR } from 'containers/HomePage/constants';
+import { LOAD_HITOKOTO, LOAD_HITOKOTO_SUCCESS, LOAD_HITOKOTO_ERROR } from 'containers/LoginPage/constants';
 import { createAction, createStandardAction } from 'typesafe-actions';
 
 export const loadHitokoto = createAction(LOAD_HITOKOTO);
