@@ -34,6 +34,7 @@ module.exports = {
 		MINExt,
 		NormalExt,
 		SassExt,
+    new webpack.HotModuleReplacementPlugin(),
 		new HtmlWebpackPlugin(HtmlWebpackConfig)
 	],
 

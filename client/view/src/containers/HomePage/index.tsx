@@ -14,6 +14,7 @@ import { $Call } from 'utility-types';
 import { ONCE_TILL_UNMOUNT } from 'constants/constants';
 
 interface IHomePageProps {
+  xxx: number;
 }
 
 const mapStateToProps = createSelector(
@@ -44,7 +45,6 @@ export class HomePage extends React.PureComponent<Props, undefined> {
 
 // tslint:disable-next-line:max-line-length
 const withConnect = connect<stateProps, dispatchProps, IHomePageProps>(mapStateToProps, mapDispatchToProps);
-
 const withReducer = injectReducer({ key: 'home', reducer });
 const withSaga = injectSaga({ key: 'home', saga, mode: ONCE_TILL_UNMOUNT });
 

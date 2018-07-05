@@ -6,7 +6,7 @@ import LoginPage from 'containers/LoginPage/Loadable';
 import Header from './Header';
 
 const App: React.SFC<{}> = () => (
-  <div>
+  <div className="root">
     <Header />
     <Switch>
       <Route exact path='/' component={HomePage} />

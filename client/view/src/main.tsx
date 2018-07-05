@@ -5,6 +5,10 @@ import { ConnectedRouter } from 'react-router-redux';
 import configureStore from './store';
 // tslint:disable-next-line:no-import-side-effect
 import 'sanitize.css/sanitize.css';
+// tslint:disable-next-line:no-import-side-effect
+import 'antd/dist/antd.css';
+// tslint:disable-next-line:no-import-side-effect
+import './themes/main.scss';
 import FontFaceObserver from 'fontfaceobserver';
 import createHistory from 'history/createBrowserHistory';
 import App from './containers/App';

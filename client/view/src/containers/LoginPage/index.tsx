@@ -1,7 +1,7 @@
 import React from 'react';
 import { createSelector } from 'reselect';
 import { Dispatch } from 'redux';
-import { Form, Input, Icon, Checkbox, Button } from 'antd';
+import { Form, Input, Icon, Checkbox, Button, Card } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 
 import { loadHitokoto } from 'containers/LoginPage/actions';
@@ -16,7 +16,7 @@ import { pageCompose} from 'utils/pageProps';
 
 const FormItem = Form.Item;
 
-interface ILoginPageProps extends FormComponentProps {
+export interface ILoginPageProps extends FormComponentProps {
   x: number;
 }
 
@@ -38,38 +38,34 @@ export class LoginPage extends React.PureComponent<ILoginPageProps, undefined> {
 
   public render() {
     console.log(this.props);
-    // const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator } = this.props.form;
     return (
-      <div>登陆界面</div>
-      // <Form onSubmit={this.handleSubmit} className="login-form">
-      //   <FormItem>
-      //     {getFieldDecorator('userName', {
-      //       rules: [{ required: true, message: 'Please input your username!' }]
-      //     })(
-      //       <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
-      //     )}
-      //   </FormItem>
-      //   <FormItem>
-      //     {getFieldDecorator('password', {
-      //       rules: [{ required: true, message: 'Please input your Password!' }]
-      //     })(
-      //       <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
-      //     )}
-      //   </FormItem>
-      //   <FormItem>
-      //     {getFieldDecorator('remember', {
-      //       valuePropName: 'checked',
-      //       initialValue: true
-      //     })(
-      //       <Checkbox>Remember me</Checkbox>
-      //     )}
-      //     <a className="login-form-forgot" href="">Forgot password</a>
-      //     <Button type="primary" htmlType="submit" className="login-form-button">
-      //       Log in
-      //     </Button>
-      //     Or <a href="">register now!</a>
-      //   </FormItem>
-      // </Form>
+      <div className="page-login">
+        <Card className="login-container relative-center">
+          <div>韬图教育</div>
+          <Form onSubmit={this.handleSubmit} className="login-form">
+            <FormItem>
+              {getFieldDecorator('userName', {
+                rules: [{ required: true, message: 'Please input your username!' }]
+              })(
+                <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
+              )}
+            </FormItem>
+            <FormItem>
+              {getFieldDecorator('password', {
+                rules: [{ required: true, message: 'Please input your Password!' }]
+              })(
+                <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
+              )}
+            </FormItem>
+            <FormItem>
+              <Button type="primary" htmlType="submit" className="btn-login">
+                Log in
+              </Button>
+            </FormItem>
+          </Form>
+        </Card>
+      </div>
     );
   }
 
@@ -83,4 +79,4 @@ export default pageCompose<ILoginPageProps>({
   mapDispatchToProps,
   reducer: {key: 'login', reducer},
   saga: {key: 'login', saga}
-})(LoginPage);
+})(Form.create()(LoginPage));
