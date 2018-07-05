@@ -1,11 +1,11 @@
 import React from 'react';
 import { createSelector } from 'reselect';
+import { IState } from 'Interfaces/state';
 import { Dispatch } from 'redux';
 import { Form, Input, Icon, Checkbox, Button, Card } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 
 import { loadHitokoto } from 'containers/LoginPage/actions';
-import { makeSelectHitokoto } from 'containers/LoginPage/selectors';
 
 import reducer from './reducer';
 import saga from './saga';
@@ -21,8 +21,8 @@ export interface ILoginPageProps extends FormComponentProps {
 }
 
 const mapStateToProps = createSelector(
-  makeSelectHitokoto(),
-  (hitokoto) => ({ hitokoto })
+  (state: IState) => state.get('login'),
+  (loginState: IState) => ({ hitokoto: loginState.get('hitokoto') })
 );
 
 export const mapDispatchToProps = (dispatch: Dispatch) => ({
@@ -31,18 +31,18 @@ export const mapDispatchToProps = (dispatch: Dispatch) => ({
 
 type Props = $Call<typeof mapStateToProps> & ILoginPageProps & $Call<typeof mapDispatchToProps>;
 
-export class LoginPage extends React.PureComponent<ILoginPageProps, undefined> {
+export class LoginPage extends React.PureComponent<Props, undefined> {
   constructor(props: Props) {
     super(props);
   }
 
   public render() {
-    console.log(this.props);
     const { getFieldDecorator } = this.props.form;
     return (
       <div className="page-login">
+        <div className="mask" />
         <Card className="login-container relative-center">
-          <div>韬图教育</div>
+          <div className="login-title">韬图教育</div>
           <Form onSubmit={this.handleSubmit} className="login-form">
             <FormItem>
               {getFieldDecorator('userName', {
@@ -59,9 +59,7 @@ export class LoginPage extends React.PureComponent<ILoginPageProps, undefined> {
               )}
             </FormItem>
             <FormItem>
-              <Button type="primary" htmlType="submit" className="btn-login">
-                Log in
-              </Button>
+              <Button type="primary" htmlType="submit" className="btn-login">登陆</Button>
             </FormItem>
           </Form>
         </Card>

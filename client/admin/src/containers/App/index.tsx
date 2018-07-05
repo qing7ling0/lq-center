@@ -1,7 +1,7 @@
 import React from 'react';
 import { Switch, Route } from 'react-router';
 import HomePage from 'containers/HomePage/Loadable';
-import LoginPage from 'containers/LoginPage/Loadable';
+import LoginPage from 'containers/LoginPage';
 
 import Header from './Header';
 
