@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"lq-"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
 )
@@ -14,13 +15,14 @@ type User struct {
 	account       string `orm:"size(40);unique"`
 	password      string `orm:"size(40)"`
 	channel       uint32
-	lastLoginIp   string       `orm:"size(50)"`
+	lastLoginIP   string       `orm:"size(50)"`
 	lastLoginTime time.Time    `orm:"type(datetime)"`
 	profile       *UserProfile `orm:"null;rel(one)"`
 	createdTime   time.Time    `orm:"auto_now_add;type(datetime)"`
 	updatedTime   time.Time    `orm:"auto_now;type(datetime)"`
 }
 
+// UserProfile Mode Struct
 type UserProfile struct {
 	Id          int
 	name        string    `orm:"size(100)"`
@@ -31,37 +33,33 @@ type UserProfile struct {
 	updatedTime time.Time `orm:"auto_now;type(datetime)"`
 }
 
-type RegisterStatus int
-
-const (
-	SUCCESS = iota
-	ErrorAccountOrPasswordNotVaild
-	ErrorAccountNull
-	ErrorAccountExsit
-)
-
 func init() {
-
 	// register model
 	orm.RegisterModel(new(User), new(UserProfile))
 }
 
-func register(account string, password string, channel uint32) RegisterStatus {
+func register(account string, password string, channel uint32) (RegisterStatus, int64) {
 	if account == "" {
-		return ErrorAccountNull
+		return ErrorAccountNull, IDNull
 	}
 	o := orm.NewOrm()
 	var user User
 	user.account = account
-	user.password = password
-	user.channel = channel
 
-	id, err := o.Insert(&user)
-	if err == nil {
-		fmt.Println(id)
+	// 检查此账号是否已存在
+	if o.Read(&user) == nil {
+		user.password = password
+		user.channel = channel
+
+		id, err := o.Insert(&user)
+		if err == nil {
+			return user, nil
+		}
+	} else {
+		return ErrorAccountExsit, IDNull
 	}
 
-	return SUCCESS
+	return nil, IDNull
 }
 
 func login(account string, password string, channel uint32) *User {
@@ -77,7 +75,7 @@ func login(account string, password string, channel uint32) *User {
 	} else {
 	}
 
-	return user
+	return &user
 }
 
 func loginSuccess(id int, ip string) {
@@ -89,7 +87,7 @@ func loginSuccess(id int, ip string) {
 	user := User{Id: id}
 
 	if o.Read(&user) == nil {
-		user.lastLoginIp = ip
+		user.lastLoginIP = ip
 		user.lastLoginTime = time.Now()
 		if num, err := o.Update(&user); err == nil {
 			fmt.Println(num)
