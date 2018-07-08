@@ -1,10 +1,10 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
-	"lq-"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
 )
@@ -38,9 +38,9 @@ func init() {
 	orm.RegisterModel(new(User), new(UserProfile))
 }
 
-func register(account string, password string, channel uint32) (RegisterStatus, int64) {
+func register(account string, password string, channel uint32) (*User, error) {
 	if account == "" {
-		return ErrorAccountNull, IDNull
+		return nil, errors.New("账号不能为空")
 	}
 	o := orm.NewOrm()
 	var user User
@@ -53,13 +53,16 @@ func register(account string, password string, channel uint32) (RegisterStatus, 
 
 		id, err := o.Insert(&user)
 		if err == nil {
-			return user, nil
+			var profile UserProfile;
+			id, err := o.Insert(&profile)
+			
+			return &user, nil
 		}
 	} else {
-		return ErrorAccountExsit, IDNull
+		return nil, errors.New("账号已存在！")
 	}
 
-	return nil, IDNull
+	return nil, errors.New("注册失败！")
 }
 
 func login(account string, password string, channel uint32) *User {
