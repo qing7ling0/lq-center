@@ -51,11 +51,11 @@ func register(account string, password string, channel uint32) (*User, error) {
 		user.password = password
 		user.channel = channel
 
-		id, err := o.Insert(&user)
+		_, err := o.Insert(&user)
 		if err == nil {
-			var profile UserProfile;
-			id, err := o.Insert(&profile)
-			
+			var profile UserProfile
+			o.Insert(&profile)
+
 			return &user, nil
 		}
 	} else {

@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/astaxie/beego"
 )
 
@@ -18,5 +20,14 @@ type UserController struct {
 func (u *UserController) Get() {
 	uid := u.GetString(":uid")
 	u.Data["json"] = uid
+	u.ServeJSON()
+}
+
+// @Title Login
+// @router /login [post]
+func (u *UserController) Login() {
+	account := u.GetString("account")
+	fmt.Println("Login account=" + account)
+	u.Data["json"] = "dd"
 	u.ServeJSON()
 }

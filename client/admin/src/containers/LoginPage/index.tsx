@@ -1,17 +1,15 @@
 import React from 'react';
-import { createSelector } from 'reselect';
 import { IState } from 'Interfaces/state';
-import { Dispatch } from 'redux';
-import { Form, Input, Icon, Checkbox, Button, Card } from 'antd';
+import { Form, Input, Icon, Checkbox, Button, Card, message } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 
-import { loadHitokoto } from 'containers/LoginPage/actions';
+import actions from './actions';
 
 import reducer from './reducer';
 import saga from './saga';
 
-import { $Call } from 'utility-types';
 import { pageCompose} from 'utils/pageProps';
+import * as constants from './constants';
 // import FormItemComponent from '../../components/form/FormItemComponent';
 
 const FormItem = Form.Item;
@@ -20,16 +18,18 @@ export interface ILoginPageProps extends FormComponentProps {
   x: number;
 }
 
-const mapStateToProps = createSelector(
-  (state: IState) => state.get('login'),
-  (loginState: IState) => ({ hitokoto: loginState.get('hitokoto') })
-);
+const stateProps = (state: IState) => {
+  const login: any = state.get('login');
+  return {
+    user: login.get('user')
+  };
+};
 
-export const mapDispatchToProps = (dispatch: Dispatch) => ({
-  onGetHitokoto: () => (dispatch(loadHitokoto()))
-});
+const actionCreators = {
+  reqLogin: actions.reqLogin
+};
 
-type Props = $Call<typeof mapStateToProps> & ILoginPageProps & $Call<typeof mapDispatchToProps>;
+type Props = typeof stateProps & ILoginPageProps & typeof actionCreators;
 
 export class LoginPage extends React.PureComponent<Props, undefined> {
   constructor(props: Props) {
@@ -43,23 +43,23 @@ export class LoginPage extends React.PureComponent<Props, undefined> {
         <div className="mask" />
         <Card className="login-container relative-center">
           <div className="login-title">韬图教育</div>
-          <Form onSubmit={this.handleSubmit} className="login-form">
+          <Form className="login-form">
             <FormItem>
               {getFieldDecorator('userName', {
-                rules: [{ required: true, message: 'Please input your username!' }]
+                rules: [{ required: true, message: '请输入用户名!' }, {validator: this.checkAccount}]
               })(
-                <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
+                <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="账号" />
               )}
             </FormItem>
             <FormItem>
               {getFieldDecorator('password', {
-                rules: [{ required: true, message: 'Please input your Password!' }]
+                rules: [{ required: true, message: '请输入密码!' }, {validator: this.checkPassword}]
               })(
-                <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
+                <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="密码" />
               )}
             </FormItem>
             <FormItem>
-              <Button type="primary" htmlType="submit" className="btn-login">登陆</Button>
+              <Button type="primary" onClick={() => this.onLoginBtnClicked()} className="btn-login">登陆</Button>
             </FormItem>
           </Form>
         </Card>
@@ -67,14 +67,97 @@ export class LoginPage extends React.PureComponent<Props, undefined> {
     );
   }
 
-  handleSubmit() {
-    return false;
+  checkAccount(rule: any, value: string, callback: any) {
+    if (!value) {
+      callback("账号不能为空!");
+    } else if (value.length < constants.ACCOUNT_MIN_LENGTH || value.length > constants.ACCOUNT_MAX_LENGTH) {
+      callback(`账号长度在${constants.ACCOUNT_MIN_LENGTH}-${constants.ACCOUNT_MAX_LENGTH}!`);
+    } else if (!/^[a-zA-Z0-9_-]*$/.test(value)) {
+      callback("账号只能是数字、字母!");
+    }
+    callback();
+  }
+
+  checkPassword(rule: any, value: string, callback: any) {
+    if (!value) {
+      callback("密码不能为空!");
+    } else if (value.length < constants.ACCOUNT_MIN_LENGTH || value.length > constants.ACCOUNT_MAX_LENGTH) {
+      callback(`密码长度在${constants.ACCOUNT_MIN_LENGTH}-${constants.ACCOUNT_MAX_LENGTH}!`);
+    } else if (!/^[0-9a-zA-Z~!@#$%\^&*\(\)_+-=\[\]\{\<\>\,\.\/?|\`\}]*$/.test(value)) {
+      callback("密码只能是数字、字母!");
+    }
+    callback();
+  }
+
+  onLogin(account: string, password: string) {
+    account = account.trim();
+    password = password.trim();
+
+    let focusAccount = false;
+    let focusPassword = false;
+
+    if (!account) {
+      message.error("账号密码不能为空!");
+      focusAccount = true;
+    } else if (account.length < constants.ACCOUNT_MIN_LENGTH || account.length > constants.ACCOUNT_MAX_LENGTH) {
+      message.error(`账号密码长度在${constants.ACCOUNT_MIN_LENGTH}-${constants.ACCOUNT_MAX_LENGTH}!`);
+      focusAccount = true;
+    } else if (!account) {
+      // todo 验证字符串格式是否合法
+      message.error("账号密码只能是数字、字母");
+      focusAccount = true;
+    }
+
+    if (!password) {
+      if (!focusAccount) {
+        message.error("账号密码不能为空!");
+      }
+      focusPassword = true;
+    } else if (password.length < constants.ACCOUNT_MIN_LENGTH || password.length > constants.ACCOUNT_MAX_LENGTH) {
+      if (!focusAccount) {
+        message.error(`账号密码长度在${constants.ACCOUNT_MIN_LENGTH}-${constants.ACCOUNT_MAX_LENGTH}!`);
+      }
+      focusPassword = true;
+    }  else if (!password) {
+      // todo 验证字符串格式是否合法
+      if (!focusAccount) {
+        message.error("账号密码只能是数字、字母");
+      }
+      focusPassword = true;
+    }
+
+    if (focusAccount || focusPassword) {
+      // this.props.reqLogin(account, password);
+      // if (focusAccount) {
+      //   if(this.refAccountInput) {
+      //     this.refAccountInput.focus();
+      //   }
+      // }
+      // if (focusPassword) {
+      //   if(this.refPasswordInput) {
+      //     this.refPasswordInput.focus();
+      //   }
+      // }
+      // this.setState({accountError:focusAccount, passwordError:focusPassword});
+    } else {
+      this.props.reqLogin(account, password);
+      // this.props.reqLogin(account, password);
+      // this.setState({accountError:false, passwordError:false});
+    }
+  }
+
+  onLoginBtnClicked() {
+    this.props.form.validateFieldsAndScroll((err: any, values: any) => {
+      if (!err) {
+        this.onLogin(values.userName, values.password);
+      }
+    });
   }
 }
 
 export default pageCompose<ILoginPageProps>({
-  mapStateToProps,
-  mapDispatchToProps,
+  stateProps,
+  actionCreators,
   reducer: {key: 'login', reducer},
   saga: {key: 'login', saga}
 })(Form.create()(LoginPage));

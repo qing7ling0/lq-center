@@ -1,8 +1,6 @@
 import { fromJS } from 'immutable';
-import { $Call, $Values } from 'utility-types';
-import * as actions from './actions';
+import actions, { LoginActionType } from './actions';
 import { getType } from 'typesafe-actions';
-export type LoginAction = $Call<$Values<typeof actions>>;
 
 const initialState = fromJS({
   loading: false,
@@ -10,21 +8,16 @@ const initialState = fromJS({
   hitokoto: undefined
 });
 
-export default function loginReducer(state = initialState, action: LoginAction) {
+export default function loginReducer(state = initialState, action: LoginActionType) {
+  const result: any = action.payload;
   switch (action.type) {
-    case getType(actions.loadHitokoto):
-      return state
-        .set('loading', true)
-        .set('error', false)
-        .set('hitokoto', undefined);
-    case getType(actions.hitokotoLoaded):
-      return state
-        .set('loading', false)
-        .set('hitokoto', action.payload);
-    case getType(actions.hitokotoLoadingError):
-      return state
-        .set('error', true)
-        .set('loading', false);
+    case getType(actions.resLogin):
+      state = state.set('loading', false);
+      if (result.code === 0) {
+        state.set('user', result.data.user);
+      }
+    case getType(actions.reqLogin):
+      return state.set('loading', true);
     default:
       return state;
   }

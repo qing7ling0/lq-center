@@ -1,7 +1,7 @@
 import { createMemoryHistory } from 'history';
 import { put } from 'redux-saga/effects';
 
-import configureStore from '../../store';
+import configureStore from 'store';
 import getInjectors, {
   injectSagaFactory,
   ejectSagaFactory,
@@ -10,8 +10,8 @@ import {
   DAEMON,
   ONCE_TILL_UNMOUNT,
   RESTART_ON_REMOUNT,
-} from '../../constants/constants';
-import { IStore } from '../../Interfaces/store';
+} from 'constants/constants';
+import { IStore } from 'Interfaces/store';
 import { $Call } from 'utility-types';
 
 function* testSaga() {

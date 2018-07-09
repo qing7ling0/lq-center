@@ -1,6 +1,6 @@
-import { hitokotoLoaded, hitokotoLoadingError, loadHitokoto } from 'containers/HomePage/actions';
+import { hitokotoLoaded, hitokotoLoadingError, loadHitokoto } from './actions';
 import { put, takeLatest, call } from 'redux-saga/effects';
-import { LOAD_HITOKOTO } from 'containers/HomePage/constants';
+import { LOAD_HITOKOTO } from './constants';
 
 export async function fetchHitokoto() {
   return fetch('https://sslapi.hitokoto.cn/').then(res => res.json());

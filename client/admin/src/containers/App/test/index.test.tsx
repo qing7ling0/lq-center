@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import App from '../index';
+import App from '..';
 
 import Header from '../Header';
 import { Route } from 'react-router';

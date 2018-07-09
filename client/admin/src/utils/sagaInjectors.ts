@@ -5,8 +5,8 @@ import {
   DAEMON,
   ONCE_TILL_UNMOUNT,
   RESTART_ON_REMOUNT,
-} from '../constants/constants';
-import { IStore } from '../Interfaces/store';
+} from 'constants/constants';
+import { IStore } from 'Interfaces/store';
 import { SagaIterator } from 'redux-saga';
 
 const allowedModes = [RESTART_ON_REMOUNT, DAEMON, ONCE_TILL_UNMOUNT];

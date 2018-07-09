@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import LoadingIndicator from '../index';
+import LoadingIndicator from '..';
 
 describe('<LoadingIndicator />', () => {
   it('should render the `messages.loading`', () => {

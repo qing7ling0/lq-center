@@ -1,7 +1,7 @@
 import {fromJS} from 'immutable';
 
 import homeReducer from '../reducer';
-import {loadHitokoto, hitokotoLoaded, hitokotoLoadingError} from 'containers/HomePage/actions';
+import {loadHitokoto, hitokotoLoaded, hitokotoLoadingError} from '../../HomePage/actions';
 
 describe('homeReducer', () => {
   let state: any;

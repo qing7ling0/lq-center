@@ -1,7 +1,7 @@
 import invariant from 'invariant';
 
 import checkStore from './checkStore';
-import createReducer from '../reducers';
+import createReducer from 'reducers';
 import { Reducer } from 'redux';
 import { IStore } from 'Interfaces/store';
 

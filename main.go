@@ -6,7 +6,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 )
 
 func initSQL() {
@@ -15,8 +15,8 @@ func initSQL() {
 	url := beego.AppConfig.String("mysqlurls")
 	name := beego.AppConfig.String("mysqldb")
 
-	orm.RegisterDriver("mysql", orm.DRMySQL)
-	orm.RegisterDataBase("default", "mysql", user+":"+pass+"@tcp("+url+")/"+name+"?charset=utf8")
+	orm.RegisterDriver("postgres", orm.DRMySQL)
+	orm.RegisterDataBase("default", "postgres", "postgres://"+user+":"+pass+"@"+url+"/"+name+"?sslmode=disable")
 	orm.RunSyncdb("default", false, true)
 }
 

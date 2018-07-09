@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'react-router-redux';
-import configureStore from './store';
+import configureStore from 'store';
 // tslint:disable-next-line:no-import-side-effect
 import 'sanitize.css/sanitize.css';
 // tslint:disable-next-line:no-import-side-effect
@@ -11,7 +11,7 @@ import 'antd/dist/antd.css';
 import './themes/main.scss';
 import FontFaceObserver from 'fontfaceobserver';
 import createHistory from 'history/createBrowserHistory';
-import App from './containers/App';
+import App from 'containers/App';
 
 const openSansObserver = new FontFaceObserver('Noto Sans', {});
 

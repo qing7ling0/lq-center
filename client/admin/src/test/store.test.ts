@@ -3,7 +3,7 @@
  */
 
 import createHistory from 'history/createBrowserHistory';
-import configureStore from '../store';
+import configureStore from 'store';
 import { IStore } from 'Interfaces/store';
 
 describe('configureStore', () => {

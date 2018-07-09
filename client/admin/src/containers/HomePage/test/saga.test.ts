@@ -1,7 +1,7 @@
-import hitokotoData, {getHitokoto, fetchHitokoto} from 'containers/HomePage/saga';
+import hitokotoData, {getHitokoto, fetchHitokoto} from '../saga';
 import {put, takeLatest, call} from 'redux-saga/effects';
-import {hitokotoLoaded, hitokotoLoadingError, loadHitokoto} from 'containers/HomePage/actions';
-import {LOAD_HITOKOTO} from 'containers/HomePage/constants';
+import {hitokotoLoaded, hitokotoLoadingError, loadHitokoto} from '../actions';
+import {LOAD_HITOKOTO} from '../constants';
 
 describe('getHitokoto Saga', () => {
   let getHitokotoGenerator: IterableIterator<any>;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import Helloworld from '../index';
+import Helloworld from '..';
 
 describe('<Helloworld />', () => {
   it('should render the `messages.startProjectHeader`', () => {

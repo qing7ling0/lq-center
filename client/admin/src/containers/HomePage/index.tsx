@@ -2,14 +2,14 @@ import { createSelector } from 'reselect';
 import React from 'react';
 import { Dispatch, compose } from 'redux';
 import { connect } from 'react-redux';
-import Helloworld from 'components/helloworld/index';
-import { loadHitokoto } from 'containers/HomePage/actions';
+import Helloworld from 'components/helloworld';
+import { loadHitokoto } from './actions';
 import reducer from './reducer';
 import saga from './saga';
 
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
-import { makeSelectHitokoto } from 'containers/HomePage/selectors';
+import { makeSelectHitokoto } from './selectors';
 import { $Call } from 'utility-types';
 import { ONCE_TILL_UNMOUNT } from 'constants/constants';
 

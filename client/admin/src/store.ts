@@ -3,8 +3,8 @@ import { fromJS } from 'immutable';
 import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
 import { History } from 'history';
-import { IStore } from './Interfaces/store';
-import createReducer from './reducers';
+import { IStore } from 'Interfaces/store';
+import createReducer from 'reducers';
 
 const sagaMiddleware = createSagaMiddleware();
 

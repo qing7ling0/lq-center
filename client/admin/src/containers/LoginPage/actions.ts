@@ -1,8 +1,12 @@
-import { LOAD_HITOKOTO, LOAD_HITOKOTO_SUCCESS, LOAD_HITOKOTO_ERROR } from 'containers/LoginPage/constants';
-import { createAction, createStandardAction } from 'typesafe-actions';
+import { LOAD_HITOKOTO, LOAD_HITOKOTO_SUCCESS, LOAD_HITOKOTO_ERROR, LOGIN_REQ, LOGIN_RES } from './constants';
+import { createAction, createStandardAction, getType, ActionType } from 'typesafe-actions';
+import {IResponse} from 'Interfaces/response';
 
-export const loadHitokoto = createAction(LOAD_HITOKOTO);
-
-export const hitokotoLoaded = createStandardAction(LOAD_HITOKOTO_SUCCESS)<string>();
-
-export const hitokotoLoadingError = createStandardAction(LOAD_HITOKOTO_ERROR)<object>();
+const actions = {
+  reqLogin : createAction(LOGIN_REQ, resolve => {
+    return (account: string, password: string) => resolve({account, password});
+  }),
+  resLogin : createStandardAction(LOGIN_RES)<IResponse>()
+};
+export default actions;
+export type LoginActionType = ActionType<typeof actions>;

@@ -1,9 +1,8 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 
-import { HomePage, mapDispatchToProps } from '../';
-import Helloworld from '../../../components/helloworld/index';
-import { changeTheme } from '../../ThemeProvider/actions';
+import { HomePage, mapDispatchToProps } from '..';
+import Helloworld from 'components/helloworld';
 
 describe('<HomePage />', () => {
 

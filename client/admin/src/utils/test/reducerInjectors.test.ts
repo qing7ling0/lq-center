@@ -1,12 +1,12 @@
 import { createMemoryHistory } from 'history';
 import { fromJS } from 'immutable';
-import configureStore from '../../store';
+import configureStore from 'store';
 
 import getInjectors, {
   injectReducerFactory,
 } from '../reducerInjectors';
 import { Action } from 'redux';
-import { IStore } from '../../Interfaces/store';
+import { IStore } from 'Interfaces/store';
 import { $Call } from 'utility-types';
 
 const initialState = fromJS({ reduced: 'soon' });
