@@ -12,7 +12,7 @@ export default class NetUtils {
             });
     }
 
-    static postJson(url: string, data: any): Promise<IResponse> {
+    static post(url: string, data: any): Promise<IResponse> {
         const fetchOptions = {
             method: 'POST',
             headers: {

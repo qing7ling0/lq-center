@@ -54,9 +54,8 @@ function bindActionCreators<T>(actions: any, dispatch: Dispatch): T {
   const ret: any = {};
   for (const key in actions) {
     if (actions.hasOwnProperty(key)) {
-      ret[key] = () => {
-        console.log(arguments);
-        console.log(arguments[0]);
+      ret[key] = (...items: any[]) => {
+        dispatch(actions[key](...items));
       };
     }
   }

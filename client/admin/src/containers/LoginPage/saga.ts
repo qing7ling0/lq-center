@@ -5,7 +5,7 @@ import NetHandler from 'net/netHandler';
 
 export function* login(action: LoginActionType) {
   try {
-    const data = yield call(NetHandler.post, 'login', action.payload);
+    const data = yield call(NetHandler.post, 'user/login', action.payload);
     yield put(actions.resLogin(data));
   } catch (err) {
     yield put(actions.resLogin({code: -1, message: '登陆失败'}));

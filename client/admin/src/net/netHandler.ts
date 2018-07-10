@@ -2,7 +2,7 @@ import {IResponse} from 'Interfaces/response';
 import { DEBUG, DEV_SERVER, PROD_SERVER } from 'constants/constants';
 import NetUtils from './netUtils';
 
-const SERVER_ADDRESS = DEBUG ? DEV_SERVER : PROD_SERVER;
+const SERVER_ADDRESS = (DEBUG ? DEV_SERVER : PROD_SERVER) + '/';
 
 export default class NetHandler {
   static get(url: string, data: any): Promise<IResponse> {
@@ -10,7 +10,7 @@ export default class NetHandler {
   }
 
   static post(url: string, data: any): Promise<IResponse> {
-    return NetUtils.postJson(SERVER_ADDRESS + url, data);
+    return NetUtils.post(SERVER_ADDRESS + url, data);
   }
 
 }

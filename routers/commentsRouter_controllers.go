@@ -9,17 +9,17 @@ func init() {
 
 	beego.GlobalControllerRouter["lq-center-go/controllers:UserController"] = append(beego.GlobalControllerRouter["lq-center-go/controllers:UserController"],
 		beego.ControllerComments{
-			Method: "Get",
-			Router: `/:uid`,
-			AllowHTTPMethods: []string{"get"},
+			Method: "Login",
+			Router: `/login`,
+			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})
 
 	beego.GlobalControllerRouter["lq-center-go/controllers:UserController"] = append(beego.GlobalControllerRouter["lq-center-go/controllers:UserController"],
 		beego.ControllerComments{
-			Method: "Login",
-			Router: `/login`,
-			AllowHTTPMethods: []string{"post"},
+			Method: "Profile",
+			Router: `/profile/:uid`,
+			AllowHTTPMethods: []string{"get"},
 			MethodParams: param.Make(),
 			Params: nil})
 
