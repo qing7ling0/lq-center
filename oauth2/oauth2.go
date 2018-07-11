@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"fmt"
 	"lq-center-go/models"
 	"time"
 )
@@ -8,8 +9,13 @@ import (
 var store *TokenStore
 
 func init() {
+	fmt.Println("----------OAUTH2 INIT BEGAN ----------")
 	var err error
 	store, err = NewStore()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("----------OAUTH2 INIT END ----------")
 }
 
 // LoginSuccess 用账号密码登陆成功

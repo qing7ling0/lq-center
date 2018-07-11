@@ -23,11 +23,19 @@ func GenerateCode(data *GenerateBasic, isGenRefresh bool) (code, refresh string,
 	buf.WriteString(data.UserID)
 	buf.WriteString(strconv.FormatInt(data.CreateAt.UnixNano(), 10))
 
-	code = base64.URLEncoding.EncodeToString(uuid.NewV3(uuid.NewV4(), buf.String()).Bytes())
-	code = strings.ToUpper(strings.TrimRight(code, "="))
-	if isGenRefresh {
-		refresh = base64.URLEncoding.EncodeToString(uuid.NewV5(uuid.NewV4(), buf.String()).Bytes())
-		refresh = strings.ToUpper(strings.TrimRight(refresh, "="))
+	if u, err := uuid.NewV4(); err == nil {
+		code = base64.URLEncoding.EncodeToString(uuid.NewV3(u, buf.String()).Bytes())
+		code = strings.ToUpper(strings.TrimRight(code, "="))
+		if isGenRefresh {
+			if u, err = uuid.NewV4(); err == nil {
+				refresh = base64.URLEncoding.EncodeToString(uuid.NewV5(u, buf.String()).Bytes())
+				refresh = strings.ToUpper(strings.TrimRight(refresh, "="))
+			} else {
+				return "", "", err
+			}
+		}
+	} else {
+		return "", "", err
 	}
 
 	return

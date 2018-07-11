@@ -85,33 +85,29 @@ func (s *TokenStore) RemoveByRefresh(refresh string) error {
 }
 
 // GetTokenByToken by access token
-func (s *TokenStore) GetTokenByToken(code string) (token *Token, err error) {
+func (s *TokenStore) GetTokenByToken(code string) (*Token, error) {
 	basicID, err := s.getBasicID(code)
 	if err != nil {
 		return nil, err
 	}
-	t, err := s.getData(code)
+	t, err := s.getData(basicID)
 	if err != nil {
 		return nil, err
 	}
-
-	token = t
-	return
+	return t, err
 }
 
 // GetTokenByRefresh by refresh token
-func (s *TokenStore) GetTokenByRefresh(refresh string) (token *Token, err error) {
+func (s *TokenStore) GetTokenByRefresh(refresh string) (*Token, error) {
 	basicID, err := s.getBasicID(refresh)
 	if err != nil {
 		return nil, err
 	}
-	t, err := s.getData(refresh)
+	t, err := s.getData(basicID)
 	if err != nil {
 		return nil, err
 	}
-
-	token = t
-	return
+	return t, err
 }
 
 // getBasicID by key
