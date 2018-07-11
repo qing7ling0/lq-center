@@ -10,6 +10,7 @@ var (
 	ErrAccountExsit       = errors.New("账号已存在！")
 	ErrAccountNotExsit    = errors.New("账号不存在！")
 	ErrRegisterFailed     = errors.New("注册失败！")
+	ErrUserNotExsit       = errors.New("用户不存在！")
 )
 
 // Define common constants

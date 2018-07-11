@@ -33,12 +33,6 @@ func (u *UserController) Login() {
 	user := models.UserInput{}
 	err := json.Unmarshal(u.Ctx.Input.RequestBody, &user)
 
-	_, rgErr := models.Register(&models.RegisterInput{Account: "lq-1212", Password: "wuqingqing", Channel: models.ChannelTaoTu})
-	if rgErr != nil {
-		fmt.Println("注册失败:" + rgErr.Error())
-		u.ServeJSON()
-		return
-	}
 	if err == nil {
 		fmt.Println("Login account=" + string(u.Ctx.Input.RequestBody))
 		sucUser, loginErr := models.Login(&user)

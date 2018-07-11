@@ -1,6 +1,8 @@
 package models
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"regexp"
 	"time"
@@ -8,7 +10,6 @@ import (
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
 	_ "github.com/go-sql-driver/mysql" // import your used driver
-	"golang.org/x/crypto/bcrypt"
 )
 
 // User Model Struct
@@ -79,7 +80,7 @@ func CheckAccountValid(value string) error {
 	return nil
 }
 
-// 注册
+// Register  注册
 func Register(userInput *RegisterInput) (*User, error) {
 	if userInput == nil {
 		return nil, ErrFailed
@@ -94,14 +95,13 @@ func Register(userInput *RegisterInput) (*User, error) {
 	var user User
 	user.Account = userInput.Account
 
-	rdErr := o.Read(&user)
+	rdErr := o.Read(&user, "account")
 	// 检查此账号是否已存在
 	if rdErr == orm.ErrNoRows {
-		hashedPass, err := bcrypt.GenerateFromPassword([]byte(userInput.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return nil, err
-		}
-		user.Password = string(hashedPass)
+		ha256 := sha256.New()
+		ha256.Write([]byte(userInput.Password))
+		hashedPass := ha256.Sum(nil)
+		user.Password = hex.EncodeToString(hashedPass)
 		user.Channel = userInput.Channel
 
 		uid, err2 := o.Insert(&user)
@@ -124,14 +124,11 @@ func Register(userInput *RegisterInput) (*User, error) {
 		fmt.Println(err2)
 
 		return nil, ErrRegisterFailed
-	} else {
-		fmt.Println(rdErr)
-		return nil, ErrAccountExsit
 	}
-
-	return nil, ErrRegisterFailed
+	return nil, ErrAccountExsit
 }
 
+// Login
 // 登陆
 func Login(userInput *UserInput) (*User, error) {
 	if userInput == nil {

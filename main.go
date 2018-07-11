@@ -26,6 +26,7 @@ func initSQL() {
 
 func test() {
 	fmt.Println("----------test start----------")
+
 	fmt.Println("----------test end----------")
 }
 
