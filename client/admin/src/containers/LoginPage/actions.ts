@@ -4,7 +4,7 @@ import {IResponse} from 'Interfaces/response';
 
 const actions = {
   reqLogin : createAction(LOGIN_REQ, resolve => {
-    return (account: string, password: string) => resolve({account, password});
+    return (account: string, password: string) => resolve({account, password, channel: "taotu"});
   }),
   resLogin : createStandardAction(LOGIN_RES)<IResponse>()
 };

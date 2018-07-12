@@ -12,15 +12,15 @@ import (
 
 // GenerateBasic struct
 type GenerateBasic struct {
-	UserID   string
+	UserID   int64
 	CreateAt time.Time
 }
 
 // GenerateCode 生成code
 func GenerateCode(data *GenerateBasic, isGenRefresh bool) (code, refresh string, err error) {
 
-	buf := bytes.NewBufferString(data.UserID)
-	buf.WriteString(data.UserID)
+	buf := bytes.NewBufferString("")
+	buf.WriteString(strconv.FormatInt(data.UserID, 10))
 	buf.WriteString(strconv.FormatInt(data.CreateAt.UnixNano(), 10))
 
 	if u, err := uuid.NewV4(); err == nil {

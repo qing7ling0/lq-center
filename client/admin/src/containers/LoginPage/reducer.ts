@@ -13,6 +13,7 @@ export default function loginReducer(state = initialState, action: LoginActionTy
   switch (action.type) {
     case getType(actions.resLogin):
       state = state.set('loading', false);
+      console.log("resLogin=" + JSON.stringify(result));
       if (result.code === 0) {
         state.set('user', result.data.user);
       }

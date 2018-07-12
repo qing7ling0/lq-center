@@ -84,9 +84,26 @@ func (s *TokenStore) RemoveByRefresh(refresh string) error {
 	return s.remove(refresh)
 }
 
+// RemoveByToken use the token to delete the token information
+func (s *TokenStore) RemoveByToken(token *Token) error {
+	if token == nil {
+		return ErrPointerNil
+	}
+	basicID, err := s.getBasicID(token.GetRefresh())
+	if err == nil {
+		err = s.remove(basicID)
+	}
+	err = s.RemoveByRefresh(token.GetRefresh())
+	err = s.RemoveByCode(token.GetCode())
+	return err
+}
+
 // GetTokenByToken by access token
 func (s *TokenStore) GetTokenByToken(code string) (*Token, error) {
 	basicID, err := s.getBasicID(code)
+	if err == ErrTokenNotExist {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -100,6 +117,9 @@ func (s *TokenStore) GetTokenByToken(code string) (*Token, error) {
 // GetTokenByRefresh by refresh token
 func (s *TokenStore) GetTokenByRefresh(refresh string) (*Token, error) {
 	basicID, err := s.getBasicID(refresh)
+	if err == ErrTokenNotExist {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}

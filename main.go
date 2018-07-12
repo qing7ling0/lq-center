@@ -5,6 +5,8 @@ import (
 	_ "lq-center-go/models"
 	_ "lq-center-go/routers"
 
+	_ "lq-center-go/oauth2"
+
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/plugins/cors"

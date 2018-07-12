@@ -9,7 +9,7 @@ func NewToken() *Token {
 
 // Token token model
 type Token struct {
-	UserID           string
+	UserID           int64
 	Scope            string
 	Code             string
 	CodeCreateAt     time.Time
@@ -25,12 +25,12 @@ func (t *Token) New() *Token {
 }
 
 // GetUserID the user id
-func (t *Token) GetUserID() string {
+func (t *Token) GetUserID() int64 {
 	return t.UserID
 }
 
 // SetUserID the user id
-func (t *Token) SetUserID(userID string) {
+func (t *Token) SetUserID(userID int64) {
 	t.UserID = userID
 }
 

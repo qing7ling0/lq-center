@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"lq-center-go/consts"
 	"regexp"
 	"time"
 
@@ -53,12 +54,38 @@ type RegisterInput struct {
 	Type     string
 }
 
+// TokenOutput token返回
+type TokenOutput struct {
+	AccessToken  string
+	RefreshToken string
+	ExpiresIn    time.Duration
+}
+
 func init() {
 	// register model
 	orm.RegisterModel(new(User), new(UserProfile))
 }
 
-// 检查账号密码是否有效
+// User2ProfileOutput
+func User2ProfileOutput(user *User) (interface{}, error) {
+	out := map[string]interface{}{
+		"id":            user.Id,
+		"account":       user.Account,
+		"lastLoginIP":   user.LastLoginIP,
+		"lastLoginTime": user.LastLoginTime.Format(consts.TimeFormatString)}
+	if user.Profile != nil {
+		out["name"] = user.Profile.Name
+		out["sex"] = user.Profile.Name
+		out["phone"] = user.Profile.Phone
+		out["email"] = user.Profile.Email
+		out["address"] = user.Profile.Address
+		out["createdTime"] = user.Profile.CreatedTime.Format(consts.TimeFormatString)
+		out["updatedTime"] = user.Profile.UpdatedTime.Format(consts.TimeFormatString)
+	}
+	return out, nil
+}
+
+// CheckAccountValid 检查账号密码是否有效
 func CheckAccountValid(value string) error {
 	if value == "" {
 		return ErrAccountPassNull
@@ -172,7 +199,7 @@ func Login(userInput *UserInput) (*User, error) {
 		return &user, nil
 	}
 
-	return nil, ErrAccountNotExsit
+	return nil, ErrAccountPass
 }
 
 // LoginSuccess 登陆成功
@@ -191,4 +218,18 @@ func LoginSuccess(id int64, ip string) {
 			fmt.Println(num)
 		}
 	}
+}
+
+// GetUserProfile 获取用户信息
+func GetUserProfile(id int64) (*User, error) {
+	o := orm.NewOrm()
+	var user User
+	user.Id = id
+
+	err := o.Read(&user)
+	if err == nil {
+		return &user, nil
+	}
+
+	return nil, ErrUserNotExsit
 }
