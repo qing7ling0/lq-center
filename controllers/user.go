@@ -40,8 +40,8 @@ func (u *UserController) Profile() {
 // @Description get user by uid
 // @Param	uid		path 	string	true		"The key for staticblock"
 // @Success 200 {object} models.User
-// @Failure 403 :uid is empty
-// @router /profile_token/:uid [get]
+// @Failure 403 :token is empty
+// @router /profile_token/:token [get]
 func (u *UserController) ProfileByToken() {
 	token := u.GetString(":token")
 	tokenInfo, err := oauth2.CheckToken(token)
@@ -66,43 +66,28 @@ func (u *UserController) ProfileByToken() {
 // Login user login
 // @router /login [post]
 func (u *UserController) Login() {
-	session := u.GetSession("token")
-	// session 判断
-	if session != nil {
-		token := session.(models.TokenOutput)
-		u.Data["json"] = Success2Response(&token)
-		u.ServeJSON()
-		return
-	}
-	user := models.UserInput{}
-	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &user); err == nil {
-		fmt.Println("Login account=" + string(u.Ctx.Input.RequestBody))
-		sucUser, loginErr := models.Login(&user)
-		if loginErr != nil {
-			u.Data["json"] = Error2Response(loginErr)
+	user, err := u.onLogin()
+	// h := md5.New()
+	// h.Write([]byte("wuqingqing")) // 需要加密的字符串为 123456
+	// cipherStr := h.Sum(nil)
+	// fmt.Println("register password=" + hex.EncodeToString(cipherStr))
+	// models.Register(&models.RegisterInput{Account: "lq-1212", Password: hex.EncodeToString(cipherStr), Channel: consts.ChannelTaoTu})
+	if user != nil {
+		out, err := models.User2ProfileOutput(user)
+		if out != nil {
+			u.SetSession("user", user)
+			u.Data["json"] = Success2Response(out)
 		} else {
-			models.LoginSuccess(sucUser.Id, "ip")
-			token, err := oauth2.LoginSuccess(sucUser.Id)
-			if err != nil {
-				u.Data["json"] = Error2Response(err)
-			} else {
-				tokenOut := models.TokenOutput{
-					AccessToken:  token.GetCode(),
-					RefreshToken: token.GetRefresh(),
-					ExpiresIn:    token.GetCodeExpiresIn()}
-				u.SetSession("token", tokenOut)
-				u.SetSession("user", sucUser)
-				u.Data["json"] = Success2Response(&tokenOut)
-			}
+			u.Data["json"] = Error2Response(err)
 		}
 	} else {
-		fmt.Println(err.Error())
-		u.Data["json"] = ResponseError
+		u.Data["json"] = Error2Response(err)
 	}
 	u.ServeJSON()
 }
 
 // Register user register
+// @router /register [post]
 func (u *UserController) Register() {
 	userInput := models.RegisterInput{}
 	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &userInput); err != nil {
@@ -130,6 +115,30 @@ func (u *UserController) Register() {
 	u.ServeJSON()
 }
 
+// Token user Token
+// @router /token [post]
+func (u *UserController) Token() {
+	user, err := u.onLogin()
+	if user != nil {
+		token, err := oauth2.LoginSuccess(user.Id)
+		if err != nil {
+			u.Data["json"] = Error2Response(err)
+		} else {
+			tokenOut := models.TokenOutput{
+				AccessToken:  token.GetCode(),
+				RefreshToken: token.GetRefresh(),
+				ExpiresIn:    token.GetCodeExpiresIn()}
+			u.SetSession("token", tokenOut)
+			u.SetSession("user", user)
+			u.Data["json"] = Success2Response(&tokenOut)
+		}
+	} else {
+		u.Data["json"] = Error2Response(err)
+	}
+
+	u.ServeJSON()
+}
+
 // RefreshToken refresh token
 // @router /refresh [post]
 func (u *UserController) RefreshToken() {
@@ -153,4 +162,26 @@ func (u *UserController) RefreshToken() {
 		u.Data["json"] = ResponseError
 	}
 	u.ServeJSON()
+}
+
+func (u *UserController) onLogin() (*models.User, error) {
+	session := u.GetSession("user")
+	// session 判断
+	if session != nil {
+		user := session.(models.User)
+		return &user, nil
+	}
+	user := models.UserInput{}
+	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &user); err == nil {
+		fmt.Println("Login user=%v", user)
+		sucUser, loginErr := models.Login(&user)
+		if loginErr != nil {
+			return nil, loginErr
+		} else {
+			models.LoginSuccess(sucUser.Id, "ip")
+			return sucUser, nil
+		}
+	} else {
+		return nil, models.ErrFailed
+	}
 }

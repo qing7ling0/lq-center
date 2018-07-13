@@ -125,10 +125,7 @@ func Register(userInput *RegisterInput) (*User, error) {
 	rdErr := o.Read(&user, "account")
 	// 检查此账号是否已存在
 	if rdErr == orm.ErrNoRows {
-		ha256 := sha256.New()
-		ha256.Write([]byte(userInput.Password))
-		hashedPass := ha256.Sum(nil)
-		user.Password = hex.EncodeToString(hashedPass)
+		user.Password = passwordEncode(userInput.Password)
 		user.Channel = userInput.Channel
 
 		uid, err2 := o.Insert(&user)
@@ -190,9 +187,11 @@ func Login(userInput *UserInput) (*User, error) {
 	}
 
 	o := orm.NewOrm()
-	user := User{Account: userInput.Account, Password: userInput.Password, Channel: userInput.Channel}
+	user := User{Account: userInput.Account, Password: passwordEncode(userInput.Password), Channel: userInput.Channel}
 
-	rdErr := o.Read(&user)
+	qs := o.QueryTable("user")
+	rdErr := qs.Filter("Account", userInput.Account).Filter("Password", passwordEncode(userInput.Password)).Filter("Channel", userInput.Channel).One(&user)
+	// rdErr := o.Read(&user)
 	if rdErr == nil {
 		LoginSuccess(user.Id, "")
 
@@ -232,4 +231,12 @@ func GetUserProfile(id int64) (*User, error) {
 	}
 
 	return nil, ErrUserNotExsit
+}
+
+func passwordEncode(password string) string {
+	ha256 := sha256.New()
+	ha256.Write([]byte(password))
+	hashedPass := ha256.Sum(nil)
+
+	return hex.EncodeToString(hashedPass)
 }

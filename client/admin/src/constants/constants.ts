@@ -18,3 +18,8 @@ export const ONCE_TILL_UNMOUNT = '@@saga-injector/once-till-unmount';
 export const DEV_SERVER = 'http://127.0.0.1:8282/v1';
 
 export const PROD_SERVER = 'http://106.14.138.141:3001/v1';
+
+export const Routers = {
+  user: { id:1, name:'用户管理', url: '/home/user' },
+  userList: { id:101, name:'用户列表', url: '/home/user/list' },
+}

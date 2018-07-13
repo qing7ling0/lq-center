@@ -1,7 +1,7 @@
 import React from 'react';
 import { Switch, Route } from 'react-router';
-import HomePage from '../HomePage/Loadable';
-import LoginPage from '../LoginPage';
+import HomePage from '../home/index';
+import LoginPage from '../login/index';
 
 import Header from './Header';
 
@@ -10,7 +10,7 @@ const App: React.SFC<{}> = () => (
     <Header />
     <Switch>
       <Route exact path='/' component={LoginPage} />
-      <Route exact path='/login' component={LoginPage} />
+      <Route exact path='/home' component={HomePage} />
     </Switch>
   </div>
 );

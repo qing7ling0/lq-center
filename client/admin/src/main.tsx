@@ -32,7 +32,7 @@ const render = (Content: typeof App) => {
     <Provider store={store}>
       <ConnectedRouter history={history}>
         <Content />
-      </ ConnectedRouter>
+      </ConnectedRouter>
     </Provider>
     , MOUNT_NODE
   );

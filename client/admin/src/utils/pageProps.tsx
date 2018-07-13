@@ -1,6 +1,8 @@
 import { connect } from 'react-redux';
 import { compose, Dispatch } from 'redux';
 import { createSelector } from 'reselect';
+import { $Call } from 'utility-types';
+import { put, takeLatest, call } from 'redux-saga/effects';
 
 import { IReducer, ISaga } from 'Interfaces/saga';
 import { IState } from 'Interfaces/state';
@@ -11,21 +13,31 @@ import { ONCE_TILL_UNMOUNT } from 'constants/constants';
 interface IPageComposeType {
   stateProps: any;
   actionCreators: any;
-  reducer: IReducer;
-  saga: ISaga;
+  reducer?: IReducer;
+  saga?: ISaga;
+}
+
+function* noneSage() {
+  yield call(()=>{});
 }
 
 function pageCompose<PageProps>(pageComposeType: IPageComposeType) {
 
-  type stateProps = typeof pageComposeType.stateProps;
+  type stateProps = $Call<typeof pageComposeType.stateProps>;
   type dispatchProps = typeof pageComposeType.actionCreators;
-  if (pageComposeType.saga.mode) {
+  if (pageComposeType.saga && pageComposeType.saga.mode) {
     pageComposeType.saga.mode = ONCE_TILL_UNMOUNT;
   }
-
+  if (!pageComposeType.saga) {
+    pageComposeType.saga = {key:'none', saga:noneSage};
+  }
+  if (!pageComposeType.reducer) {
+    pageComposeType.reducer = {key:'none', reducer:(state:any={}, action: any)=>state};
+  }
+  // tslint:disable-next-line:max-line-length
   const withConnect = connect<stateProps, dispatchProps, PageProps>(createSelector((state: IState) => state, pageComposeType.stateProps), (dispatch: Dispatch) => (bindActionCreators(pageComposeType.actionCreators, dispatch)));
   const withReducer = injectReducer(pageComposeType.reducer);
-  const withSaga = injectSaga(pageComposeType.saga);
+  const withSaga =injectSaga(pageComposeType.saga);
 
   return compose(
     withReducer,

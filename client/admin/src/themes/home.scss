@@ -1,0 +1,126 @@
+.page-home {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.page-home .header {
+    background: #fff;
+    padding: 0 0.32rem;
+    box-shadow:0 1px 4px rgba(0, 21, 41, 0.08);
+    line-height: 0;
+}
+
+.page-home .header-col {
+  height: 0.64rem;
+  line-height: 0;
+}
+
+.page-home .header-user-container{
+  float: right;
+  position: relative;
+  padding-left: 28px;
+  background: transparent;
+  border:none;
+  border-radius: 0;
+  &:hover {
+    color: #fff;
+    border:none;
+    background: rgba(16,142,233,0.3);
+    outline: none;
+    cursor:pointer
+  }
+  &:active  {
+    color: #fff;
+    border:none;
+    background: rgba(16,142,233,0.43);
+    outline: none;
+  }
+  &:focus  {
+    color: #fff;
+    border:none;
+    outline: none;
+  }
+  &:after {
+    color: #fff;
+    border:none;
+    background: transparent;
+    outline: none;
+  }
+  @media \0screen\,screen\9 {/* 只支持IE6、7、8 */
+    &:hover{
+      background-color:#108ee9;
+      filter:Alpha(opacity=50);
+      position:static; /* IE6、7、8只能设置position:static(默认属性) ，否则会导致子元素继承Alpha值 */
+      *zoom:1; /* 激活IE6、7的haslayout属性，让它读懂Alpha */
+    }
+  }
+  line-height: 0.64rem;
+  height: 0.64rem;
+}
+
+.page-home .header-user-name {
+  float:right;
+  border:none;
+  height: 0.64rem;
+  font-size: 0.1rem;
+  color: #4c4f53;
+  padding: 0 15px;
+  &:hover, &:active, &:after, &:focus {
+    color: #4c4f53;
+    border:none;
+    background: transparent;
+  }
+  @media \0screen\,screen\9 {/* 只支持IE6、7、8 */
+    position: relative;/* 设置子元素为相对定位，可让子元素不继承Alpha值 */
+  }
+}
+
+.page-home .header-user-avatar {
+  background: #f56a00;
+  position: absolute;
+  top:50%;
+  left: 4px;
+  margin-top:-12px;
+  @media \0screen\,screen\9 {/* 只支持IE6、7、8 */
+    position: relative;/* 设置子元素为相对定位，可让子元素不继承Alpha值 */
+  }
+}
+
+
+
+.page-home .nav-container {
+  background-color: #181d20;
+}
+
+.page-home .nav-header-container {
+  text-align: center;
+  font-size: 0.2rem;
+  font-weight: 600;
+  color: #ccc;
+  padding: 0;
+  background-color: #181d20;
+}
+
+.page-home .nav-header-title {
+    font-size: 14px;
+}
+
+
+.page-home .nav-menu-container {
+  background-color: #181d20;
+}
+
+.page-home .nav-menu-title {
+  font-size: 0.15rem;
+  font-weight: 700;
+}
+
+.page-home .nav-menu-sub-title {
+  font-size: 0.13rem;
+}
+
+.page-home .nav-sub-menu-container {
+  border: 0 solid #aaa;
+  border-bottom: 2px;
+}

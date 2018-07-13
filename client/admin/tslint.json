@@ -38,7 +38,7 @@
       "multiline": {
         "objects": "never",
         "arrays": "never",
-        "functions": "never",
+        "functions": "ignore",
         "typeLiterals": "ignore"
       },
       "esSpecCompliant": true
@@ -49,6 +49,6 @@
     "variable-name": [true, "ban-keywords", "check-format", "allow-pascal-case", "allow-leading-underscore"],
     "jsx-no-lambda": false,
     "jsx-boolean-value" : ["never"],
-    "jsx-no-multiline-js": false
+    "jsx-no-multiline-js": false,
   }
 }
