@@ -12,7 +12,7 @@ import { pageCompose} from 'utils/pageProps';
 import HomeHeaderComponet from './components/HeaderComponent'
 import NavComponent from './components/NavComponent'
 import routers from './routers'
-import * as constants from '../../constants/constants'
+import * as constants from 'constants/constants'
 
 export interface IHomePageProps extends FormComponentProps {
   history: History;
@@ -21,7 +21,7 @@ export interface IHomePageProps extends FormComponentProps {
 const stateProps = (state: IState) => {
   const login: any = state.get('login');
   return {
-    user: login.get('user')
+    user: login && login.get('user') || null
   };
 };
 
@@ -31,6 +31,15 @@ const actionCreators = {
 type Props = $Call<typeof stateProps> & IHomePageProps & typeof actionCreators;
 
 class HomePage extends React.PureComponent<Props, undefined> {
+  
+  componentWillMount(){
+    // this.navigation = new Navigation(this.props.history);
+    // const {reqLogin, loginInfo} = this.props;
+    // if (!loginInfo.user) {
+    //   reqLogin('', '', true);
+    // }
+  }
+
   public render() {
     return (
       <Layout>
@@ -41,14 +50,18 @@ class HomePage extends React.PureComponent<Props, undefined> {
           <HomeHeaderComponet user={this.props.user} />
           <Content>
             <div className="content-container">
-              <Switch>
-                {routers} 
-                (<Redirect 
-                  key={constants.Routers.user.id} 
-                  from={constants.Routers.user.url} 
-                  to={constants.Routers.userList.url}
-                />)
-              </Switch>
+              {
+                this.props.user ?
+                <Switch>
+                  {routers} 
+                  (<Redirect 
+                    key={constants.Routers.user.id} 
+                    from={constants.Routers.user.url} 
+                    to={constants.Routers.userList.url}
+                  />)
+                </Switch>
+                : null
+              }
             </div>
           </Content>
         </Layout>

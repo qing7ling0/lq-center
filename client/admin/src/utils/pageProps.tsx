@@ -39,11 +39,12 @@ function pageCompose<PageProps>(pageComposeType: IPageComposeType) {
   const withReducer = injectReducer(pageComposeType.reducer);
   const withSaga =injectSaga(pageComposeType.saga);
 
-  return compose(
-    withReducer,
-    withSaga,
-    withConnect
-  );
+  // return compose(
+  //   withReducer,
+  //   withSaga,
+  //   withConnect
+  // );
+  return withConnect;
 }
 
 function createActionDispatch(action: any, dispatch: Dispatch) {

@@ -7,8 +7,8 @@ import { $Call } from 'utility-types';
 import md5 from 'md5'
 
 import actions from './actions';
-import reducer from './reducer';
-import saga from './saga';
+// import reducer from './reducer';
+// import saga from './saga';
 
 import { pageCompose} from 'utils/pageProps';
 import * as constants from './constants';
@@ -167,7 +167,5 @@ export class LoginPage extends React.PureComponent<Props, undefined> {
 
 export default pageCompose<ILoginPageProps>({
   stateProps,
-  actionCreators,
-  reducer: {key: 'login', reducer},
-  saga: {key: 'login', saga}
+  actionCreators
 })(Form.create()(LoginPage));

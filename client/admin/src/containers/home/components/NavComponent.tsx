@@ -46,12 +46,12 @@ export class NavComponet extends React.PureComponent<INavComponetProps, INavStat
     }
   }
 
-  onRender() {
+  render() {
     let items = this.renderSubMenus(this.props.menus, true);
     return (
       <div className="nav-container">
         <div className="nav-header-container">
-          Bola Family
+          韬图教育
         </div>
         <Menu className="nav-menu-container"
           mode="inline"
