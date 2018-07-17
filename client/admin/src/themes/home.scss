@@ -91,11 +91,13 @@
 
 .page-home .nav-container {
   background-color: #181d20;
+  overflow-x: 'hidden'; 
+  overflow-y: 'auto';
 }
 
 .page-home .nav-header-container {
   text-align: center;
-  font-size: 0.2rem;
+  font-size: 20px;
   font-weight: 600;
   color: #ccc;
   padding: 0;

@@ -66,6 +66,7 @@ func (u *UserController) ProfileByToken() {
 // Login user login
 // @router /login [post]
 func (u *UserController) Login() {
+	fmt.Println("dd")
 	user, err := u.onLogin()
 	// h := md5.New()
 	// h.Write([]byte("wuqingqing")) // 需要加密的字符串为 123456
@@ -75,13 +76,33 @@ func (u *UserController) Login() {
 	if user != nil {
 		out, err := models.User2ProfileOutput(user)
 		if out != nil {
-			u.SetSession("user", user)
+			u.SetSession("user", *user)
 			u.Data["json"] = Success2Response(out)
 		} else {
 			u.Data["json"] = Error2Response(err)
 		}
 	} else {
 		u.Data["json"] = Error2Response(err)
+	}
+	u.ServeJSON()
+}
+
+// Login user login
+// @router /login-check [post]
+func (u *UserController) LoginCheck() {
+	session := u.GetSession("user")
+	// session 判断
+	if session == nil {
+		u.Data["json"] = Error2Response(models.ErrAccountExpired)
+	} else {
+		user := session.(models.User)
+		out, err := models.User2ProfileOutput(&user)
+		if out != nil {
+			u.SetSession("user", user)
+			u.Data["json"] = Success2Response(out)
+		} else {
+			u.Data["json"] = Error2Response(err)
+		}
 	}
 	u.ServeJSON()
 }

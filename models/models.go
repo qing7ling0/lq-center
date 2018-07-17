@@ -8,6 +8,7 @@ import (
 var (
 	ErrFailed             = errors.New("请求失败！")
 	ErrChannelNotExsit    = errors.New("登陆渠道不存在！")
+	ErrAccountExpired     = errors.New("账号已过期，请重新登陆！")
 	ErrAccountPassNull    = errors.New("账号密码不能为空！")
 	ErrAccountPassInvalid = errors.New("账号密码格式不正确！")
 	ErrAccountExsit       = errors.New("账号已存在！")

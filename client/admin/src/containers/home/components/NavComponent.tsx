@@ -1,9 +1,11 @@
 import React from 'react';
 import { History } from 'history'
-import { Icon, Menu } from 'antd';
+import { Icon, Menu, Layout } from 'antd';
 
 import SubMenu from 'antd/lib/menu/SubMenu';
 import utils from 'utils/utils'
+
+const { Header } = Layout;
 
 interface INavComponetProps {
     currentNavKey: string;
@@ -50,9 +52,9 @@ export class NavComponet extends React.PureComponent<INavComponetProps, INavStat
     let items = this.renderSubMenus(this.props.menus, true);
     return (
       <div className="nav-container">
-        <div className="nav-header-container">
+        <Header className="nav-header-container">
           韬图教育
-        </div>
+        </Header>
         <Menu className="nav-menu-container"
           mode="inline"
           theme="dark"

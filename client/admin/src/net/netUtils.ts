@@ -17,8 +17,9 @@ export default class NetUtils {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify(data)
         };
         return NetUtils.request(url, fetchOptions);

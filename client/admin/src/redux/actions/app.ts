@@ -1,4 +1,4 @@
-import { LOGIN_REQ, LOGIN_RES } from '../action-type';
+import { LOGIN_REQ, LOGIN_RES, LOGIN_CHECK_REQ, LOGIN_CHECK_RES } from '../action-type';
 import { createAction, createStandardAction } from 'typesafe-actions';
 import { IResponse } from 'Interfaces/response';
 
@@ -8,3 +8,10 @@ export const reqLogin = createAction(LOGIN_REQ, resolve => {
 })
 
 export const resLogin = createStandardAction(LOGIN_RES)<IResponse>()
+
+
+export const reqLoginCheck = createAction(LOGIN_CHECK_REQ, resolve => {
+  return () => resolve({});
+})
+
+export const resLoginCheck = createStandardAction(LOGIN_CHECK_RES)<IResponse>()

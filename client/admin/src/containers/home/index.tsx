@@ -13,37 +13,49 @@ import HomeHeaderComponet from './components/HeaderComponent'
 import NavComponent from './components/NavComponent'
 import routers from './routers'
 import * as constants from 'constants/constants'
+import actions from 'redux/actions';
 
 export interface IHomePageProps extends FormComponentProps {
   history: History;
 }
 
 const stateProps = (state: IState) => {
-  const login: any = state.get('login');
+  const app: any = state.get('app');
   return {
-    user: login && login.get('user') || null
+    user: app.get('user') || null,
+    loading: app.get('loading') || false,
+    loginCheckMessage: app.get('loginCheckMessage') || ""
   };
 };
 
 const actionCreators = {
+  reqLoginCheck: actions.reqLoginCheck
 };
 
 type Props = $Call<typeof stateProps> & IHomePageProps & typeof actionCreators;
 
 class HomePage extends React.PureComponent<Props, undefined> {
   
-  componentWillMount(){
-    // this.navigation = new Navigation(this.props.history);
-    // const {reqLogin, loginInfo} = this.props;
-    // if (!loginInfo.user) {
-    //   reqLogin('', '', true);
-    // }
+  componentDidMount(){
+    const {reqLoginCheck, user} = this.props;
+    if (!user) {
+      reqLoginCheck();
+    }
+  }
+
+  componentWillReceiveProps(nextProps: Props){
+    if (!nextProps.loading && !nextProps.user) {
+      if (nextProps.loginCheckMessage) {
+        message.error(nextProps.loginCheckMessage);
+      }
+      this.props.history.replace('/login');
+    }
   }
 
   public render() {
     return (
-      <Layout>
-        <Sider style={{overflowX: 'hidden', overflowY: 'auto', backgroundColor: '#181d20'}}>
+      <Layout className="page-home">
+        <Sider className="nav-container">
           <NavComponent history={this.props.history} user={this.props.user} currentNavKey={""} menus={[]} routersIDMap={[]} />
         </Sider>
         <Layout>

@@ -6,13 +6,10 @@ import { FormComponentProps } from 'antd/lib/form';
 import { $Call } from 'utility-types';
 import md5 from 'md5'
 
-import actions from './actions';
-// import reducer from './reducer';
-// import saga from './saga';
+import actions from 'redux/actions';
 
 import { pageCompose} from 'utils/pageProps';
 import * as constants from './constants';
-// import FormItemComponent from '../../components/form/FormItemComponent';
 
 const FormItem = Form.Item;
 
@@ -21,14 +18,15 @@ export interface ILoginPageProps extends FormComponentProps {
 }
 
 const stateProps = (state: IState) => {
-  const login: any = state.get('login');
+  const app: any = state.get('app');
   return {
-    user: login.get('user')
+    user: app && app.get('user') || null
   };
 };
 
 const actionCreators = {
-  reqLogin: actions.reqLogin
+  reqLogin: actions.reqLogin,
+  reqLoginCheck: actions.reqLoginCheck
 };
 
 type Props = $Call<typeof stateProps> & ILoginPageProps & typeof actionCreators;
@@ -38,8 +36,11 @@ export class LoginPage extends React.PureComponent<Props, undefined> {
     super(props);
   }
 
+  componentWillMount(){
+    this.props.reqLoginCheck();
+  }
+
   componentWillReceiveProps(nextProps: Props) {
-    
     if (nextProps.user !== this.props.user && nextProps.user) {
       this.props.history.replace('/home');
     }

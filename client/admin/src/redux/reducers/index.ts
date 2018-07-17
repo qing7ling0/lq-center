@@ -1,17 +1,14 @@
-import { combineReducers } from 'redux';
 import { compose } from 'redux';
 import { message } from 'antd'
 import { ActionsType } from '../actions';
 
-import app from './app'
-import user from './user'
+import * as app from './app'
+import * as user from './user'
 
 interface IReducerNext {
   state: any;
   action: ActionsType
 }
-
-const reducers = combineReducers({app, user})
 
 function errorReducer(next: IReducerNext): IReducerNext {
   if (!next) return null;
@@ -57,12 +54,16 @@ function reducerCommon(state: any, action: ActionsType): IReducerNext {
 
 function reducer(reducers:any): any {
   let ret: any = {};
-  for(let key of reducers) {
-    ret[key] = (state: any, action: ActionsType) => {
-      return reducerCommon(reducers[key](state, action), action).state;
+  for(let key in reducers) {
+    ret[key] = (state: any, action: ActionsType): any => {
+      if (action.type.startsWith(key+"/")) {
+        return reducerCommon(reducers[key].reducer(state, action), action).state;
+      } else {
+        return state||reducers[key].initialState;
+      }
     }
   }
   return ret;
 }
 
-export default combineReducers(reducer({app, user}))
+export default reducer({app, user});

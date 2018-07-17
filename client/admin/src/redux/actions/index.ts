@@ -1,5 +1,5 @@
-import * as app from './app.js'
-import * as user from './user.js'
+import * as app from './app'
+import * as user from './user'
 import { ActionType } from 'typesafe-actions';
 
 const actions = {

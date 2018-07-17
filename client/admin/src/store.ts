@@ -5,6 +5,7 @@ import createSagaMiddleware from 'redux-saga';
 import { History } from 'history';
 import { IStore } from 'Interfaces/store';
 import createReducer from 'reducers';
+import saga from 'redux/saga'
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -39,5 +40,7 @@ export default function configureStore(initialState: any = {}, history: History)
       store.replaceReducer(createReducer(store.injectedReducers));
     });
   }
+
+  sagaMiddleware.run(saga);
   return store;
 }

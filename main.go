@@ -4,13 +4,27 @@ import (
 	"fmt"
 	_ "lq-center-go/models"
 	_ "lq-center-go/routers"
+	"net/http"
 
 	_ "lq-center-go/oauth2"
 
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/orm"
-	"github.com/astaxie/beego/plugins/cors"
 	_ "github.com/lib/pq"
+)
+
+const (
+	headerAllowOrigin      = "Access-Control-Allow-Origin"
+	headerAllowCredentials = "Access-Control-Allow-Credentials"
+	headerAllowHeaders     = "Access-Control-Allow-Headers"
+	headerAllowMethods     = "Access-Control-Allow-Methods"
+	headerExposeHeaders    = "Access-Control-Expose-Headers"
+	headerMaxAge           = "Access-Control-Max-Age"
+
+	headerOrigin         = "Origin"
+	headerRequestMethod  = "Access-Control-Request-Method"
+	headerRequestHeaders = "Access-Control-Request-Headers"
 )
 
 func initSQL() {
@@ -37,13 +51,27 @@ func main() {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
-	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowAllOrigins:  true,
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
-		ExposeHeaders:    []string{"Content-Length", "Access-Control-Allow-Origin", "Access-Control-Allow-Headers", "Content-Type"},
-		AllowCredentials: true,
-	}))
+
+	var cors = func(ctx *context.Context) {
+		origin := ctx.Input.Header(headerOrigin)
+		requestedMethod := ctx.Input.Header(headerRequestMethod)
+		requestedHeaders := ctx.Input.Header(headerRequestHeaders)
+
+		if origin != "" { //允许访问源
+			ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", origin)
+		}
+		ctx.ResponseWriter.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS")    //允许post访问
+		ctx.ResponseWriter.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization") //header的类型
+		ctx.ResponseWriter.Header().Set("Access-Control-Max-Age", "1728000")
+		ctx.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", "true")
+		if ctx.Input.Method() == "OPTIONS" &&
+			(requestedMethod != "" || requestedHeaders != "") {
+			ctx.ResponseWriter.WriteHeader(http.StatusNoContent)
+			return
+		}
+	}
+
+	beego.InsertFilter("*", beego.BeforeRouter, cors)
 	initSQL()
 	test()
 	beego.Run()
