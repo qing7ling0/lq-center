@@ -10,7 +10,6 @@ import (
 
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
-	_ "github.com/go-sql-driver/mysql" // import your used driver
 )
 
 // User Model Struct

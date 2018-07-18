@@ -15,7 +15,7 @@ export const DAEMON = '@@saga-injector/daemon';
  */
 export const ONCE_TILL_UNMOUNT = '@@saga-injector/once-till-unmount';
 
-export const DEV_SERVER = 'http://127.0.0.1:8282/v1';
+export const DEV_SERVER = 'http://127.0.0.1:8080/v1';
 
 export const PROD_SERVER = 'http://106.14.138.141:3001/v1';
 
