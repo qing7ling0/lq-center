@@ -60,6 +60,7 @@ func main() {
 		if origin != "" { //允许访问源
 			ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", origin)
 		}
+		// ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "*")
 		ctx.ResponseWriter.Header().Set("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS")    //允许post访问
 		ctx.ResponseWriter.Header().Set("Access-Control-Allow-Headers", "Content-Type,Authorization") //header的类型
 		ctx.ResponseWriter.Header().Set("Access-Control-Max-Age", "1728000")
@@ -72,6 +73,7 @@ func main() {
 	}
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors)
+
 	initSQL()
 	test()
 	beego.Run()

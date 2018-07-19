@@ -24,6 +24,7 @@ func (u *UserController) Profile() {
 	uid, err := u.GetInt64(":uid")
 	user, err := models.GetUserProfile(uid)
 	if user != nil {
+		
 		out, err := models.User2ProfileOutput(user)
 		if err == nil {
 			u.Data["json"] = Success2Response(out)

@@ -15,9 +15,12 @@ export const DAEMON = '@@saga-injector/daemon';
  */
 export const ONCE_TILL_UNMOUNT = '@@saga-injector/once-till-unmount';
 
-export const DEV_SERVER = 'http://127.0.0.1:8080/v1';
+export const DEV_SERVER = 'http://127.0.0.1:8282/v1';
 
 export const PROD_SERVER = 'http://106.14.138.141:3001/v1';
+
+export const DEV_UPLOAD_SERVER = 'http://127.0.0.1:8181/v1/upload';
+export const PROD_UPLOAD_SERVER = 'http://106.14.138.141:3001/v1/upload';
 
 export const PAGE_DEFAULT_SIZE = 20; // 分页的默认每页数量
 export const PAGE_BEGAN = 1; // 分页开始页

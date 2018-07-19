@@ -1,7 +1,7 @@
 import React from 'react';
 import { IState } from 'Interfaces/state';
 import { History } from 'history';
-import { Form, Input, Icon, Checkbox, Button, Card, message } from 'antd';
+import { Form, Input, Icon, Checkbox, Button, Card, message, Upload } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import { $Call } from 'utility-types';
 import md5 from 'md5'
@@ -10,6 +10,8 @@ import actions from 'redux/actions';
 
 import { pageCompose} from 'utils/pageProps';
 import * as constants from './constants';
+
+import * as CommonConstants from 'constants/constants'
 
 const FormItem = Form.Item;
 
@@ -73,9 +75,34 @@ export class LoginPage extends React.PureComponent<Props, undefined> {
               <Button type="primary" onClick={() => this.onLoginBtnClicked()} className="btn-login">登陆</Button>
             </FormItem>
           </Form>
+
+          <Upload
+            name="order"
+            accept="image/*"
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={false}
+            style={{padding:0, position:'relative'}}
+            action={CommonConstants.DEV_UPLOAD_SERVER}
+            onChange={this.onUploadPicChange}
+            withCredentials={true}
+          >
+              <div>
+                <Icon type='plus' />
+                <div className="ant-upload-text">Upload</div>
+              </div>
+          </Upload>
         </Card>
       </div>
     );
+
+  }
+
+  onUploadPicChange (result: any) {
+    const {file} = result;
+    if (file.response && file.response.data.files && file.response.data.files.length > 0) {
+      this.setState({pics:[file.response.data.files[0]]})
+    }
   }
 
   checkAccount(rule: any, value: string, callback: any) {

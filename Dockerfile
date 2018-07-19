@@ -21,8 +21,10 @@ COPY ./tests $WORKDIR/tests
 COPY ./bin $WORKDIR/bin
 COPY ./main.go $WORKDIR/
 
-RUN go build ./main.go  
-
+# RUN go build ./main.go  
 EXPOSE 8282
+
+CMD /sbin/ip route|awk '/default/ { print $3, " dockerhost" }' >> /etc/hosts && cat /etc/hosts && bee run
+
   
 #ENTRYPOINT ["./main"] 

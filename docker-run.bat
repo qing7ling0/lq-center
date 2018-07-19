@@ -1,6 +1,3 @@
-
-REM docker run -p 8080:8282 taotu/center ./bin/dev.sh
-
-docker stop taotu-center
-docker rm taotu-center
-docker run --name taotu-center -p 8080:8282 --network=host taotu/center bee run
+docker container stop taotu-center
+docker container rm taotu-center
+docker run --name taotu-center -p 8080:8282 --add-host dockerhost:192.168.99.1 taotu-center:0.0.1 
