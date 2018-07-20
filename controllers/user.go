@@ -24,8 +24,7 @@ func (u *UserController) Profile() {
 	uid, err := u.GetInt64(":uid")
 	user, err := models.GetUserProfile(uid)
 	if user != nil {
-		
-		out, err := models.User2ProfileOutput(user)
+		out := models.User2ProfileOutput(user)
 		if err == nil {
 			u.Data["json"] = Success2Response(out)
 		} else {
@@ -45,11 +44,11 @@ func (u *UserController) Profile() {
 // @router /profile_token/:token [get]
 func (u *UserController) ProfileByToken() {
 	token := u.GetString(":token")
-	tokenInfo, err := oauth2.CheckToken(token)
+	tokenInfo, _ := oauth2.CheckToken(token)
 	if tokenInfo != nil {
 		user, err := models.GetUserProfile(tokenInfo.GetUserID())
 		if user != nil {
-			out, err := models.User2ProfileOutput(user)
+			out := models.User2ProfileOutput(user)
 			if out != nil {
 				u.Data["json"] = Success2Response(out)
 			} else {
@@ -59,7 +58,7 @@ func (u *UserController) ProfileByToken() {
 			u.Data["json"] = Error2Response(err)
 		}
 	} else {
-		u.Data["json"] = Error2Response(err)
+		u.Data["json"] = CreateResponse(1, "Token已失效，请重新登陆", nil)
 	}
 	u.ServeJSON()
 }
@@ -67,7 +66,6 @@ func (u *UserController) ProfileByToken() {
 // Login user login
 // @router /login [post]
 func (u *UserController) Login() {
-	fmt.Println("dd")
 	user, err := u.onLogin()
 	// h := md5.New()
 	// h.Write([]byte("wuqingqing")) // 需要加密的字符串为 123456
@@ -75,7 +73,7 @@ func (u *UserController) Login() {
 	// fmt.Println("register password=" + hex.EncodeToString(cipherStr))
 	// models.Register(&models.RegisterInput{Account: "lq-1212", Password: hex.EncodeToString(cipherStr), Channel: consts.ChannelTaoTu})
 	if user != nil {
-		out, err := models.User2ProfileOutput(user)
+		out := models.User2ProfileOutput(user)
 		if out != nil {
 			u.SetSession("user", *user)
 			u.Data["json"] = Success2Response(out)
@@ -97,12 +95,12 @@ func (u *UserController) LoginCheck() {
 		u.Data["json"] = Error2Response(models.ErrAccountExpired)
 	} else {
 		user := session.(models.User)
-		out, err := models.User2ProfileOutput(&user)
+		out := models.User2ProfileOutput(&user)
 		if out != nil {
 			u.SetSession("user", user)
 			u.Data["json"] = Success2Response(out)
 		} else {
-			u.Data["json"] = Error2Response(err)
+			u.Data["json"] = ResponseError
 		}
 	}
 	u.ServeJSON()
@@ -146,13 +144,16 @@ func (u *UserController) Token() {
 		if err != nil {
 			u.Data["json"] = Error2Response(err)
 		} else {
+			userOut := models.User2ProfileOutput(user)
 			tokenOut := models.TokenOutput{
 				AccessToken:  token.GetCode(),
 				RefreshToken: token.GetRefresh(),
-				ExpiresIn:    token.GetCodeExpiresIn()}
+				ExpiresIn:    token.GetCodeExpiresIn(),
+				User:         userOut}
 			u.SetSession("token", tokenOut)
 			u.SetSession("user", user)
-			u.Data["json"] = Success2Response(&tokenOut)
+			fmt.Println("Token", tokenOut)
+			u.Data["json"] = Success2Response(tokenOut)
 		}
 	} else {
 		u.Data["json"] = Error2Response(err)
@@ -170,12 +171,20 @@ func (u *UserController) RefreshToken() {
 		if refreshToken != "" {
 			token, err := oauth2.RefreshToken(refreshToken)
 			if err == nil {
-				tokenOut := models.TokenOutput{
-					AccessToken:  token.GetCode(),
-					RefreshToken: token.GetRefresh(),
-					ExpiresIn:    token.GetCodeExpiresIn()}
-				u.SetSession("token", tokenOut)
-				u.Data["json"] = Success2Response(&tokenOut)
+				user, _ := models.GetUserProfile(token.GetUserID())
+				if user != nil {
+					userOut := models.User2ProfileOutput(user)
+					tokenOut := models.TokenOutput{
+						AccessToken:  token.GetCode(),
+						RefreshToken: token.GetRefresh(),
+						ExpiresIn:    token.GetCodeExpiresIn(),
+						User:         &userOut}
+					u.SetSession("token", tokenOut)
+					u.SetSession("user", user)
+					u.Data["json"] = Success2Response(&tokenOut)
+				}
+			} else {
+				u.Data["json"] = CreateResponse(1, "RefreshToken已失效，请重新登陆", nil)
 			}
 		} else {
 			u.Data["json"] = ResponseError
@@ -195,7 +204,7 @@ func (u *UserController) onLogin() (*models.User, error) {
 	}
 	user := models.UserInput{}
 	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &user); err == nil {
-		fmt.Println("Login user=%v", user)
+		fmt.Println("Login user=%v", &user)
 		sucUser, loginErr := models.Login(&user)
 		if loginErr != nil {
 			return nil, loginErr

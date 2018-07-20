@@ -58,6 +58,7 @@ type TokenOutput struct {
 	AccessToken  string
 	RefreshToken string
 	ExpiresIn    time.Duration
+	User         interface{}
 }
 
 func init() {
@@ -66,7 +67,7 @@ func init() {
 }
 
 // User2ProfileOutput
-func User2ProfileOutput(user *User) (interface{}, error) {
+func User2ProfileOutput(user *User) interface{} {
 	out := map[string]interface{}{
 		"id":            user.Id,
 		"account":       user.Account,
@@ -81,7 +82,7 @@ func User2ProfileOutput(user *User) (interface{}, error) {
 		out["createdTime"] = user.Profile.CreatedTime.Format(consts.TimeFormatString)
 		out["updatedTime"] = user.Profile.UpdatedTime.Format(consts.TimeFormatString)
 	}
-	return out, nil
+	return out
 }
 
 // CheckAccountValid 检查账号密码是否有效
@@ -186,10 +187,11 @@ func Login(userInput *UserInput) (*User, error) {
 	}
 
 	o := orm.NewOrm()
-	user := User{Account: userInput.Account, Password: passwordEncode(userInput.Password), Channel: userInput.Channel}
+	newPassword := passwordEncode(userInput.Password)
+	user := User{Account: userInput.Account, Password: newPassword}
 
 	qs := o.QueryTable("user")
-	rdErr := qs.Filter("Account", userInput.Account).Filter("Password", passwordEncode(userInput.Password)).Filter("Channel", userInput.Channel).One(&user)
+	rdErr := qs.Filter("Account", userInput.Account).Filter("Password", newPassword).One(&user)
 	// rdErr := o.Read(&user)
 	if rdErr == nil {
 		LoginSuccess(user.Id, "")

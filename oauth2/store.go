@@ -16,12 +16,12 @@ type TokenStore struct {
 
 // New creaet TokenStore
 func NewStore() (*TokenStore, error) {
-	bm, err := cache.NewCache("redis", `{"key":"tokenStore","conn":":6039","dbNum":"0","password":""}`)
+	bm, err := cache.NewCache("redis", `{"key":"tokenStore","conn":"127.0.0.1:6379"}`)
 	if err != nil {
 		return nil, err
 	}
 
-	return &TokenStore{bm}, nil
+	return &TokenStore{rdCache: bm}, nil
 }
 
 // Save create token store
@@ -29,10 +29,10 @@ func (s *TokenStore) Save(token *Token) (err error) {
 	if token == nil {
 		return ErrPointerNil
 	}
-	if token.GetCode() != "" {
+	if token.GetCode() == "" {
 		return ErrTokenCodeNull
 	}
-	if token.GetRefresh() != "" {
+	if token.GetRefresh() == "" {
 		return ErrTokenRefreshNull
 	}
 	createTime := time.Now()
