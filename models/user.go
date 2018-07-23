@@ -142,32 +142,50 @@ func Register(userInput *RegisterInput) (*User, error) {
 	rdErr := o.Read(&user, "account")
 	// 检查此账号是否已存在
 	if rdErr == orm.ErrNoRows {
+		err := o.Begin()
+		if err != nil {
+			return nil, ErrRegisterFailed
+		}
+		profile := UserProfile{}
+
 		user.Password = passwordEncode(userInput.Password)
 		user.Channel = userInput.Channel
-		uid, err2 := o.Insert(&user)
-		if err2 == nil {
-			profile := UserProfile{UserId: uid}
-			_, err2 = o.Insert(&profile)
-			// fmt.Println(err2)
+		user.Profile = &profile
 
-			retUser := User{Id: uid}
-			retUser.Profile = &profile
-			_, err2 = o.Update(user, "Profile")
-			if err2 != nil {
-				return nil, ErrRegisterFailed
-			}
-			err2 = o.Read(&retUser)
-			// fmt.Println(err2)
-
-			if err2 == nil {
-				return &retUser, nil
-			}
-
+		_, err2 := o.Insert(&profile)
+		if err2 != nil {
+			fmt.Println(err2)
+			o.Rollback()
 			return nil, ErrRegisterFailed
 		}
 
-		fmt.Println(err2)
+		uid, err2 := o.Insert(&user)
+		if err2 != nil {
+			fmt.Println(err2)
+			o.Rollback()
+			return nil, ErrRegisterFailed
+		}
 
+		profile.UserId = uid
+		_, err2 = o.Update(&profile, "UserId")
+		if err2 != nil {
+			fmt.Println(err2)
+			o.Rollback()
+			return nil, ErrRegisterFailed
+		}
+
+		retUser := User{Id: uid}
+		err2 = o.Read(&retUser)
+		// fmt.Println(err2)
+
+		if err2 == nil {
+			err = o.Commit()
+			if err == nil {
+				return &retUser, nil
+			}
+		}
+		fmt.Println(err2)
+		o.Rollback()
 		return nil, ErrRegisterFailed
 	}
 	return nil, ErrAccountExsit
@@ -277,9 +295,9 @@ func UpdateUserProfile(input *UserUpdateInput) (int64, error) {
 }
 
 // ResetUserPasswordToken 获取重置密码token
-func ResetUserPasswordToken(account string) (string, error) {
+func ResetUserPasswordToken(account string) (*User, string, error) {
 	if normalCache == nil {
-		return "", ErrFailed
+		return nil, "", ErrFailed
 	}
 
 	// 清理旧的token
@@ -293,21 +311,29 @@ func ResetUserPasswordToken(account string) (string, error) {
 	user := User{Account: account}
 
 	if o.Read(&user, "account") == nil {
+		if user.Profile != nil {
+			if o.Read(user.Profile) != nil {
+				return nil, "", ErrEmailNotExsit
+			}
+		}
+		if user.Profile != nil && user.Profile.Email != "" {
+			ha256 := sha256.New()
+			ha256.Write([]byte(account))
+			ha256.Write([]byte(strconv.FormatInt(time.Now().UnixNano(), 10)))
+			hashedToken := ha256.Sum(nil)
 
-		ha256 := sha256.New()
-		ha256.Write([]byte(account))
-		ha256.Write([]byte(strconv.FormatInt(time.Now().UnixNano(), 10)))
-		hashedToken := ha256.Sum(nil)
+			token := hex.EncodeToString(hashedToken)
 
-		token := hex.EncodeToString(hashedToken)
+			normalCache.Put(account, token, consts.ResetPasswordTokenTime)
+			normalCache.Put(token, account, consts.ResetPasswordTokenTime)
 
-		normalCache.Put(account, token, consts.ResetPasswordTokenTime)
-		normalCache.Put(token, account, consts.ResetPasswordTokenTime)
-
-		return token, nil
+			return &user, token, nil
+		} else {
+			return nil, "", ErrEmailNotExsit
+		}
 	}
 
-	return "", ErrAccountNotExsit
+	return nil, "", ErrAccountNotExsit
 }
 
 // ResetUserPassword 重置密码

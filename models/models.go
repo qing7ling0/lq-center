@@ -19,4 +19,5 @@ var (
 	ErrUserUpdateFailed   = errors.New("用户信息更新失败！")
 	ErrTokenExpired       = errors.New("已过期，请重试！")
 	ErrResetPwFailed      = errors.New("重置密码失败！")
+	ErrEmailNotExsit      = errors.New("邮箱未填写！")
 )

@@ -7,6 +7,7 @@ import (
 	"lq-center-go/models"
 	"lq-center-go/oauth2"
 	"net/smtp"
+	"strings"
 	"text/template"
 
 	"github.com/astaxie/beego"
@@ -113,7 +114,7 @@ func (u *UserController) LoginCheck() {
 // @router /register [post]
 func (u *UserController) Register() {
 	userInput := models.RegisterInput{}
-	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &userInput); err != nil {
+	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &userInput); err == nil {
 		user, err := models.Register(&userInput)
 		if err != nil {
 			u.Data["json"] = Error2Response(err)
@@ -133,6 +134,7 @@ func (u *UserController) Register() {
 			}
 		}
 	} else {
+		fmt.Println(err)
 		u.Data["json"] = ResponseError
 	}
 	u.ServeJSON()
@@ -219,29 +221,69 @@ func (u *UserController) UserUpdate() {
 // @router /resetpw_token [post]
 func (u *UserController) ResetPasswordToken() {
 	account := u.GetString("account")
-	token, err := models.ResetUserPasswordToken(account)
-
-	emailUsername := beego.AppConfig.String("TaoTuEmail")
-	emailPassword := beego.AppConfig.String("TaoTuEmailPW")
-	emailHost := beego.AppConfig.String("TaoTuEmailSmtpHost")
-	smtp.PlainAuth("", emailUsername, emailPassword, emailHost)
-
-	var body bytes.Buffer
-
-	t, _ = template.ParseFiles("templage/email_template.html")
+	user, token, err := models.ResetUserPasswordToken(account)
 
 	if err != nil {
 		u.Data["json"] = Error2Response(err)
 	} else {
-		u.Data["json"] = Success2Response(token)
+		emailUsername := beego.AppConfig.String("TaoTuEmail")
+		emailPassword := beego.AppConfig.String("TaoTuEmailPW")
+		emailHost := beego.AppConfig.String("TaoTuEmailSmtpHost")
+		emailPort := beego.AppConfig.String("TaoTuEmailSmtpPort")
+		auth := smtp.PlainAuth("", emailUsername, emailPassword, emailHost)
+
+		var body bytes.Buffer
+
+		t, err := template.ParseFiles("template/email_template.html")
+		if err != nil {
+			u.Data["json"] = Error2Response(err)
+		} else {
+			// headers := "Content-Type: text/html; charset=UTF-8"
+			// str := fmt.Sprintln("Subject: 重置密码\n%s\n\n", headers)
+			// body.Write([]byte(str))
+
+			to := []string{user.Profile.Email}
+			nickname := "韬图动漫"
+			subject := "重置密码"
+			contentType := "Content-Type: text/html; charset=UTF-8"
+
+			// body := "This is the email body."
+			msg := []byte("To: " + strings.Join(to, ",") + "\r\nFrom: " + nickname +
+				"<" + emailUsername + ">\r\nSubject: " + subject + "\r\n" + contentType + "\r\n\r\n")
+			body.Write(msg)
+			t.Execute(&body, struct {
+				Name string
+				Url  string
+			}{
+				Name: account,
+				Url:  beego.AppConfig.String("clientUrl") + "/#/reset_password/" + token,
+			})
+
+			// testEmail := "975604172@qq.com"
+			err = smtp.SendMail(emailHost+":"+emailPort, auth, emailUsername, to, body.Bytes())
+			if err != nil {
+				fmt.Println(err)
+				u.Data["json"] = Error2Response(err)
+			} else {
+				u.Data["json"] = Success2Response(struct {
+					Token   string
+					Email   string
+					Account string
+				}{
+					Token:   token,
+					Email:   user.Profile.Email,
+					Account: user.Account,
+				})
+			}
+		}
 	}
 	u.ServeJSON()
 }
 
 // ResetPassword 重置密码
-// @router /resetpw/:token [post]
+// @router /resetpw [post]
 func (u *UserController) ResetPassword() {
-	token := u.GetString(":token")
+	token := u.GetString("token")
 	password := u.GetString("password")
 	err := models.ResetUserPassword(token, password)
 	if err != nil {
