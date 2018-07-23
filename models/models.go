@@ -16,4 +16,7 @@ var (
 	ErrAccountPass        = errors.New("账号密码错误")
 	ErrRegisterFailed     = errors.New("注册失败！")
 	ErrUserNotExsit       = errors.New("用户不存在！")
+	ErrUserUpdateFailed   = errors.New("用户信息更新失败！")
+	ErrTokenExpired       = errors.New("已过期，请重试！")
+	ErrResetPwFailed      = errors.New("重置密码失败！")
 )

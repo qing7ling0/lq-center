@@ -57,8 +57,32 @@ func init() {
 
 	beego.GlobalControllerRouter["lq-center-go/controllers:UserController"] = append(beego.GlobalControllerRouter["lq-center-go/controllers:UserController"],
 		beego.ControllerComments{
+			Method: "ResetPassword",
+			Router: `/resetpw/:token`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["lq-center-go/controllers:UserController"] = append(beego.GlobalControllerRouter["lq-center-go/controllers:UserController"],
+		beego.ControllerComments{
+			Method: "ResetPasswordToken",
+			Router: `/resetpw_token`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["lq-center-go/controllers:UserController"] = append(beego.GlobalControllerRouter["lq-center-go/controllers:UserController"],
+		beego.ControllerComments{
 			Method: "Token",
 			Router: `/token`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams: param.Make(),
+			Params: nil})
+
+	beego.GlobalControllerRouter["lq-center-go/controllers:UserController"] = append(beego.GlobalControllerRouter["lq-center-go/controllers:UserController"],
+		beego.ControllerComments{
+			Method: "UserUpdate",
+			Router: `/update`,
 			AllowHTTPMethods: []string{"post"},
 			MethodParams: param.Make(),
 			Params: nil})

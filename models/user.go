@@ -6,11 +6,16 @@ import (
 	"fmt"
 	"lq-center-go/consts"
 	"regexp"
+	"strconv"
 	"time"
+
+	"github.com/astaxie/beego/cache"
 
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
 )
+
+var normalCache cache.Cache
 
 // User Model Struct
 type User struct {
@@ -28,11 +33,11 @@ type User struct {
 // UserProfile Mode Struct
 type UserProfile struct {
 	Id          int64
-	UserId      int64
+	UserId      int64     `orm:"unique"`
 	Name        string    `orm:"size(100)"`
 	Sex         byte      `orm:"default(0)"`
-	Phone       string    `orm:"size(20)"`
-	Email       string    `orm:"size(20)"`
+	Phone       string    `orm:"size(20);unique"`
+	Email       string    `orm:"size(50);unique"`
 	Address     string    `orm:"size(100)"`
 	CreatedTime time.Time `orm:"auto_now_add;type(datetime)"`
 	UpdatedTime time.Time `orm:"auto_now;type(datetime)"`
@@ -61,9 +66,21 @@ type TokenOutput struct {
 	User         interface{}
 }
 
+// UserUpdateInput 用户信息编辑
+type UserUpdateInput struct {
+	Id      int64
+	Name    string `orm:"size(100)"`
+	Sex     byte
+	Phone   string `orm:"size(20)"`
+	Email   string `orm:"size(50)"`
+	Address string `orm:"size(100)"`
+}
+
 func init() {
 	// register model
 	orm.RegisterModel(new(User), new(UserProfile))
+	bm, _ := cache.NewCache("memory", `{"interval":60}`)
+	normalCache = bm
 }
 
 // User2ProfileOutput
@@ -127,16 +144,20 @@ func Register(userInput *RegisterInput) (*User, error) {
 	if rdErr == orm.ErrNoRows {
 		user.Password = passwordEncode(userInput.Password)
 		user.Channel = userInput.Channel
-
 		uid, err2 := o.Insert(&user)
 		if err2 == nil {
 			profile := UserProfile{UserId: uid}
 			_, err2 = o.Insert(&profile)
-			fmt.Println(err2)
+			// fmt.Println(err2)
 
 			retUser := User{Id: uid}
+			retUser.Profile = &profile
+			_, err2 = o.Update(user, "Profile")
+			if err2 != nil {
+				return nil, ErrRegisterFailed
+			}
 			err2 = o.Read(&retUser)
-			fmt.Println(err2)
+			// fmt.Println(err2)
 
 			if err2 == nil {
 				return &retUser, nil
@@ -232,6 +253,88 @@ func GetUserProfile(id int64) (*User, error) {
 	}
 
 	return nil, ErrUserNotExsit
+}
+
+// UpdateUserProfile 修改用户信息
+func UpdateUserProfile(input *UserUpdateInput) (int64, error) {
+	o := orm.NewOrm()
+	var user User
+	user.Id = input.Id
+	profile := UserProfile{UserId: input.Id}
+	profile.Name = input.Name
+	profile.Phone = input.Phone
+	profile.Address = input.Address
+	profile.Sex = input.Sex
+	profile.Email = input.Email
+	user.Profile = &profile
+
+	num, err := o.Update(user)
+	// err := o.Read(&user)
+	if err == nil {
+		return num, nil
+	}
+	return 0, ErrUserUpdateFailed
+}
+
+// ResetUserPasswordToken 获取重置密码token
+func ResetUserPasswordToken(account string) (string, error) {
+	if normalCache == nil {
+		return "", ErrFailed
+	}
+
+	// 清理旧的token
+	if normalCache.IsExist(account) {
+		t := normalCache.Get(account).(string)
+		normalCache.Delete(account)
+		normalCache.Delete(t)
+	}
+
+	o := orm.NewOrm()
+	user := User{Account: account}
+
+	if o.Read(&user, "account") == nil {
+
+		ha256 := sha256.New()
+		ha256.Write([]byte(account))
+		ha256.Write([]byte(strconv.FormatInt(time.Now().UnixNano(), 10)))
+		hashedToken := ha256.Sum(nil)
+
+		token := hex.EncodeToString(hashedToken)
+
+		normalCache.Put(account, token, consts.ResetPasswordTokenTime)
+		normalCache.Put(token, account, consts.ResetPasswordTokenTime)
+
+		return token, nil
+	}
+
+	return "", ErrAccountNotExsit
+}
+
+// ResetUserPassword 重置密码
+func ResetUserPassword(token string, password string) error {
+	if normalCache == nil {
+		return ErrFailed
+	}
+
+	account := normalCache.Get(token)
+	if account == nil {
+		return ErrTokenExpired
+	}
+
+	o := orm.NewOrm()
+	user := User{Account: account.(string)}
+	user.Password = passwordEncode(password)
+
+	if o.Read(&user, "account") == nil {
+		_, err := o.Update(&user, "password")
+		if err != nil {
+			fmt.Println(err)
+			return ErrResetPwFailed
+		}
+		return nil
+	}
+
+	return ErrAccountNotExsit
 }
 
 func passwordEncode(password string) string {

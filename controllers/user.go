@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"lq-center-go/models"
 	"lq-center-go/oauth2"
+	"net/smtp"
+	"text/template"
 
 	"github.com/astaxie/beego"
 )
@@ -191,6 +194,60 @@ func (u *UserController) RefreshToken() {
 		}
 	} else {
 		u.Data["json"] = ResponseError
+	}
+	u.ServeJSON()
+}
+
+// UserUpdate 修改用户信息
+// @router /update [post]
+func (u *UserController) UserUpdate() {
+	userInput := models.UserUpdateInput{}
+	if err := json.Unmarshal(u.Ctx.Input.RequestBody, &userInput); err != nil {
+		num, err := models.UpdateUserProfile(&userInput)
+		if err != nil {
+			u.Data["json"] = Error2Response(err)
+		} else {
+			u.Data["json"] = Success2Response(num)
+		}
+	} else {
+		u.Data["json"] = ResponseError
+	}
+	u.ServeJSON()
+}
+
+// ResetPasswordToken 获取重置密码token
+// @router /resetpw_token [post]
+func (u *UserController) ResetPasswordToken() {
+	account := u.GetString("account")
+	token, err := models.ResetUserPasswordToken(account)
+
+	emailUsername := beego.AppConfig.String("TaoTuEmail")
+	emailPassword := beego.AppConfig.String("TaoTuEmailPW")
+	emailHost := beego.AppConfig.String("TaoTuEmailSmtpHost")
+	smtp.PlainAuth("", emailUsername, emailPassword, emailHost)
+
+	var body bytes.Buffer
+
+	t, _ = template.ParseFiles("templage/email_template.html")
+
+	if err != nil {
+		u.Data["json"] = Error2Response(err)
+	} else {
+		u.Data["json"] = Success2Response(token)
+	}
+	u.ServeJSON()
+}
+
+// ResetPassword 重置密码
+// @router /resetpw/:token [post]
+func (u *UserController) ResetPassword() {
+	token := u.GetString(":token")
+	password := u.GetString("password")
+	err := models.ResetUserPassword(token, password)
+	if err != nil {
+		u.Data["json"] = Error2Response(err)
+	} else {
+		u.Data["json"] = Success2Response(nil)
 	}
 	u.ServeJSON()
 }
