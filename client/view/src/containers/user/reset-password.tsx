@@ -4,6 +4,7 @@ import { match } from 'react-router'
 import { Form, Input, Icon, Checkbox, Button, Card, message } from 'antd';
 import { FormComponentProps } from 'antd/lib/form';
 import { $Call } from 'utility-types';
+import md5 from 'md5'
 
 import actions from 'redux/actions';
 
@@ -20,7 +21,8 @@ export interface IResetPasswordPageProps extends FormComponentProps {
 const stateProps = (state: IState) => {
   const user: any = state.get('user');
   return {
-    // userList: user.get('userList')
+    loading: user.get('loading') || false,
+    resetPasswordSuccess: user.get('resetPasswordSuccess') || false
   };
 };
 
@@ -41,25 +43,30 @@ export class ResetPasswordPage extends React.PureComponent<Props, undefined> {
       <div className="page-login">
         <div className="mask" />
         <Card className="login-container relative-center" title={<div className="login-title">设置新密码</div>}>
-          <Form className="login-form">
-            <FormItem>
-              {getFieldDecorator('password', {
-                rules: [{ required: true, message: '输入新密码!' }, {validator: this.checkPassword}]
-              })(
-                <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="输入新密码" />
-              )}
-            </FormItem>
-            <FormItem>
-              {getFieldDecorator('password2', {
-                rules: [{ required: true, message: '再次输入密码!' }, {validator: this.checkPassword2}]
-              })(
-                <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="再次输入密码" />
-              )}
-            </FormItem>
-            <FormItem>
-              <Button type="primary" onClick={() => this.onResetBtnClicked()} className="btn-login">重置</Button>
-            </FormItem>
-          </Form>
+          {
+            this.props.resetPasswordSuccess?
+            <div className="login-title">重置密码成功！</div>
+            :
+            <Form className="login-form">
+              <FormItem>
+                {getFieldDecorator('password', {
+                  rules: [{ required: true, message: '输入新密码!' }, {validator: this.checkPassword}]
+                })(
+                  <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="输入新密码" />
+                )}
+              </FormItem>
+              <FormItem>
+                {getFieldDecorator('password2', {
+                  rules: [{ required: true, message: '再次输入密码!' }, {validator: this.checkPassword2}]
+                })(
+                  <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="再次输入密码" />
+                )}
+              </FormItem>
+              <FormItem>
+                <Button loading={this.props.loading} type="primary" onClick={() => this.onResetBtnClicked()} className="btn-login">重置</Button>
+              </FormItem>
+            </Form>
+          }
         </Card>
       </div>
     );
@@ -93,7 +100,7 @@ export class ResetPasswordPage extends React.PureComponent<Props, undefined> {
   onReset(password: string) {
     password = password.trim();
     let token = this.props.match.params.token
-    this.props.reqResetPassword(token, password)
+    this.props.reqResetPassword(token, md5(password))
   }
 
   onResetBtnClicked() {

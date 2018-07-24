@@ -6,10 +6,13 @@ import (
 	_ "lq-center-go/routers"
 	"net/http"
 
+	_ "github.com/astaxie/beego/cache/redis"
+
 	_ "lq-center-go/oauth2"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	_ "github.com/lib/pq"
 )
@@ -42,8 +45,19 @@ func initSQL() {
 
 func test() {
 	fmt.Println("----------test start----------")
-
+	// for i := 0; i < 20; i++ {
+	// 	logs.Debug("dfasdfa")
+	// }
 	fmt.Println("----------test end----------")
+}
+
+func initLog() {
+	fmt.Println("----------initLog start----------")
+
+	logs.SetLogger("console")
+	logs.SetLogger(logs.AdapterFile, `{"filename":"logs/log.log", "maxdays":30, "maxlines":500000}`)
+
+	fmt.Println("----------initLog end----------")
 }
 
 func main() {
@@ -74,7 +88,9 @@ func main() {
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors)
 
+	initLog()
 	initSQL()
 	test()
+	logs.Info("app run")
 	beego.Run()
 }

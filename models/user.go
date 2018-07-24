@@ -5,17 +5,15 @@ import (
 	"encoding/hex"
 	"fmt"
 	"lq-center-go/consts"
+	"lq-center-go/utils/cache"
 	"regexp"
 	"strconv"
 	"time"
 
-	"github.com/astaxie/beego/cache"
-
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/astaxie/beego/validation"
 )
-
-var normalCache cache.Cache
 
 // User Model Struct
 type User struct {
@@ -79,8 +77,6 @@ type UserUpdateInput struct {
 func init() {
 	// register model
 	orm.RegisterModel(new(User), new(UserProfile))
-	bm, _ := cache.NewCache("memory", `{"interval":60}`)
-	normalCache = bm
 }
 
 // User2ProfileOutput
@@ -296,15 +292,16 @@ func UpdateUserProfile(input *UserUpdateInput) (int64, error) {
 
 // ResetUserPasswordToken 获取重置密码token
 func ResetUserPasswordToken(account string) (*User, string, error) {
-	if normalCache == nil {
+	if cache.RDCache == nil {
 		return nil, "", ErrFailed
 	}
 
 	// 清理旧的token
-	if normalCache.IsExist(account) {
-		t := normalCache.Get(account).(string)
-		normalCache.Delete(account)
-		normalCache.Delete(t)
+	if cache.RDCache.IsExist(account) {
+		logs.Debug("清理Token")
+		t := string(cache.RDCache.Get(account).([]byte))
+		cache.RDCache.Delete(account)
+		cache.RDCache.Delete(t)
 	}
 
 	o := orm.NewOrm()
@@ -323,9 +320,11 @@ func ResetUserPasswordToken(account string) (*User, string, error) {
 			hashedToken := ha256.Sum(nil)
 
 			token := hex.EncodeToString(hashedToken)
-
-			normalCache.Put(account, token, consts.ResetPasswordTokenTime)
-			normalCache.Put(token, account, consts.ResetPasswordTokenTime)
+			err := cache.RDCache.Put(account, token, consts.ResetPasswordTokenTime)
+			logs.Error(err)
+			err = cache.RDCache.Put(token, account, consts.ResetPasswordTokenTime)
+			logs.Error(err)
+			// logs.Info(string(cache.RDCache.Get(account).([]byte])))
 
 			return &user, token, nil
 		} else {
@@ -338,20 +337,20 @@ func ResetUserPasswordToken(account string) (*User, string, error) {
 
 // ResetUserPassword 重置密码
 func ResetUserPassword(token string, password string) error {
-	if normalCache == nil {
+	if cache.RDCache == nil {
 		return ErrFailed
 	}
 
-	account := normalCache.Get(token)
+	account := cache.RDCache.Get(token)
 	if account == nil {
 		return ErrTokenExpired
 	}
 
 	o := orm.NewOrm()
-	user := User{Account: account.(string)}
-	user.Password = passwordEncode(password)
+	user := User{Account: string(account.([]byte))}
 
 	if o.Read(&user, "account") == nil {
+		user.Password = passwordEncode(password)
 		_, err := o.Update(&user, "password")
 		if err != nil {
 			fmt.Println(err)

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/cache"
 	_ "github.com/astaxie/beego/cache/redis"
 	uuid "github.com/satori/go.uuid"
@@ -16,7 +17,7 @@ type TokenStore struct {
 
 // New creaet TokenStore
 func NewStore() (*TokenStore, error) {
-	bm, err := cache.NewCache("redis", `{"key":"tokenStore","conn":"127.0.0.1:6379"}`)
+	bm, err := cache.NewCache("redis", `{"key":"tokenStore","conn":"`+beego.AppConfig.String("redisUrl")+`"}`)
 	if err != nil {
 		return nil, err
 	}

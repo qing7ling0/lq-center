@@ -20,7 +20,9 @@ export interface ILoginPageProps extends FormComponentProps {
 const stateProps = (state: IState) => {
   const app: any = state.get('app');
   return {
-    user: app && app.get('user') || null
+    user: app && app.get('user') || null,
+    loginMessage: app.get('loginMessage') || "",
+    loading: app.get('loading') || false,
   };
 };
 
@@ -48,7 +50,6 @@ export class LoginPage extends React.PureComponent<Props, undefined> {
 
   public render() {
     const { getFieldDecorator } = this.props.form;
-    const xdd = <div></div>
     return (
       <div className="page-login">
         <div className="mask" />
