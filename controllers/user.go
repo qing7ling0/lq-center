@@ -154,6 +154,7 @@ func (u *UserController) Token() {
 				AccessToken:  token.GetCode(),
 				RefreshToken: token.GetRefresh(),
 				ExpiresIn:    token.GetCodeExpiresIn(),
+				CreateAt:     token.GetCodeCreateAt(),
 				User:         userOut}
 			u.SetSession("token", tokenOut)
 			u.SetSession("user", user)
@@ -164,6 +165,37 @@ func (u *UserController) Token() {
 		u.Data["json"] = Error2Response(err)
 	}
 
+	u.ServeJSON()
+}
+
+// LoginByToken user login by token
+// @router /login_token [post]
+func (u *UserController) LoginByToken() {
+	tokenString := u.GetString("token")
+	if tokenString != "" {
+		token, _ := oauth2.GetToken(tokenString)
+		if token != nil {
+			user, _ := models.GetUserProfile(token.GetUserID())
+			if user != nil {
+				userOut := models.User2ProfileOutput(user)
+				tokenOut := models.TokenOutput{
+					AccessToken:  token.GetCode(),
+					RefreshToken: token.GetRefresh(),
+					ExpiresIn:    token.GetCodeExpiresIn(),
+					CreateAt:     token.GetCodeCreateAt(),
+					User:         &userOut}
+				u.SetSession("token", tokenOut)
+				u.SetSession("user", user)
+				u.Data["json"] = Success2Response(&tokenOut)
+			} else {
+				u.Data["json"] = Error2Response(models.ErrAccountNotExsit)
+			}
+		} else {
+			u.Data["json"] = CreateResponse(1, "Token已失效，请重新登陆", nil)
+		}
+	} else {
+		u.Data["json"] = ResponseError
+	}
 	u.ServeJSON()
 }
 
@@ -221,7 +253,8 @@ func (u *UserController) UserUpdate() {
 // @router /resetpw_token [post]
 func (u *UserController) ResetPasswordToken() {
 	account := u.GetString("account")
-	user, token, err := models.ResetUserPasswordToken(account)
+	redirect_uri := u.GetString("redirect_uri")
+	user, token, err := models.ResetUserPasswordToken(account, redirect_uri)
 
 	if err != nil {
 		u.Data["json"] = Error2Response(err)
@@ -285,11 +318,11 @@ func (u *UserController) ResetPasswordToken() {
 func (u *UserController) ResetPassword() {
 	token := u.GetString("token")
 	password := u.GetString("password")
-	err := models.ResetUserPassword(token, password)
+	v, err := models.ResetUserPassword(token, password)
 	if err != nil {
 		u.Data["json"] = Error2Response(err)
 	} else {
-		u.Data["json"] = Success2Response(nil)
+		u.Data["json"] = Success2Response(v)
 	}
 	u.ServeJSON()
 }

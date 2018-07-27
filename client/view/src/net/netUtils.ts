@@ -76,4 +76,20 @@ export default class NetUtils {
         url += urlStr;
         return NetUtils.request(url, null);
     }
+
+    static getJson(url: string, data: any): Promise<IResponse> {
+        let urlStr: string = "";
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                if (urlStr === '') {
+                    urlStr = '?';
+                } else {
+                    urlStr += '&';
+                }
+                urlStr += data[key];
+            }
+        }
+        url += urlStr;
+        return NetUtils.request(url, null);
+    }
 }

@@ -3,6 +3,7 @@ package models
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"lq-center-go/consts"
 	"lq-center-go/utils/cache"
@@ -61,6 +62,7 @@ type TokenOutput struct {
 	AccessToken  string
 	RefreshToken string
 	ExpiresIn    time.Duration
+	CreateAt     time.Time
 	User         interface{}
 }
 
@@ -291,7 +293,7 @@ func UpdateUserProfile(input *UserUpdateInput) (int64, error) {
 }
 
 // ResetUserPasswordToken 获取重置密码token
-func ResetUserPasswordToken(account string) (*User, string, error) {
+func ResetUserPasswordToken(account string, redirectUri string) (*User, string, error) {
 	if cache.RDCache == nil {
 		return nil, "", ErrFailed
 	}
@@ -302,6 +304,15 @@ func ResetUserPasswordToken(account string) (*User, string, error) {
 		t := string(cache.RDCache.Get(account).([]byte))
 		cache.RDCache.Delete(account)
 		cache.RDCache.Delete(t)
+	}
+
+	jv, err := json.Marshal(map[string]interface{}{
+		"account": account,
+		"uri":     redirectUri,
+	})
+	if err != nil {
+		logs.Error(err)
+		return nil, "", ErrFailed
 	}
 
 	o := orm.NewOrm()
@@ -322,7 +333,8 @@ func ResetUserPasswordToken(account string) (*User, string, error) {
 			token := hex.EncodeToString(hashedToken)
 			err := cache.RDCache.Put(account, token, consts.ResetPasswordTokenTime)
 			logs.Error(err)
-			err = cache.RDCache.Put(token, account, consts.ResetPasswordTokenTime)
+			err = cache.RDCache.Put(token, jv, consts.ResetPasswordTokenTime)
+			// err = cache.RDCache.Put(token, account, consts.ResetPasswordTokenTime)
 			logs.Error(err)
 			// logs.Info(string(cache.RDCache.Get(account).([]byte])))
 
@@ -336,30 +348,46 @@ func ResetUserPasswordToken(account string) (*User, string, error) {
 }
 
 // ResetUserPassword 重置密码
-func ResetUserPassword(token string, password string) error {
+func ResetUserPassword(token string, password string) (map[string]interface{}, error) {
 	if cache.RDCache == nil {
-		return ErrFailed
+		return nil, ErrFailed
 	}
 
-	account := cache.RDCache.Get(token)
+	_t := map[string]interface{}{
+		"account": "",
+		"uri":     "",
+	}
+
+	jv := cache.RDCache.Get(token)
+	if jv == nil {
+		return nil, ErrTokenExpired
+	}
+
+	err := json.Unmarshal(jv.([]byte), &_t)
+	if err != nil {
+		logs.Error(err)
+		return nil, ErrFailed
+	}
+
+	account := _t["account"]
 	if account == nil {
-		return ErrTokenExpired
+		return nil, ErrTokenExpired
 	}
 
 	o := orm.NewOrm()
-	user := User{Account: string(account.([]byte))}
+	user := User{Account: account.(string)}
 
 	if o.Read(&user, "account") == nil {
 		user.Password = passwordEncode(password)
 		_, err := o.Update(&user, "password")
 		if err != nil {
-			fmt.Println(err)
-			return ErrResetPwFailed
+			logs.Error(err)
+			return nil, ErrResetPwFailed
 		}
-		return nil
+		return _t, nil
 	}
 
-	return ErrAccountNotExsit
+	return nil, ErrAccountNotExsit
 }
 
 func passwordEncode(password string) string {

@@ -80,7 +80,9 @@ export class ResetPasswordTokenPage extends React.PureComponent<Props, undefined
   onResetBtnClicked() {
     this.props.form.validateFieldsAndScroll((err: any, values: any) => {
       if (!err) {
-        this.props.reqResetPasswordToken(values.account.trim())
+        let redirect_uri = this.props.match.params.redirect_uri
+        redirect_uri = encodeURIComponent("https://baidu.com")
+        this.props.reqResetPasswordToken(values.account.trim(), redirect_uri)
       }
     });
   }

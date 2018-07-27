@@ -30,7 +30,11 @@ export function reducer(state = initialState, action: ActionsType) {
       return state.set('resetPasswordSuccess', false);
     case getType(actions.resResetPassword):
       if (result.code === 0) {
-        return state.set('resetPasswordSuccess', true);
+        state = state.set('resetPasswordSuccess', true)
+        if (result.data) {
+          return state.set('resetPasswordRedirectUri', result.data.uri);
+        }
+        return state
       }
       return state;
     default:

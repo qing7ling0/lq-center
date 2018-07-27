@@ -22,7 +22,8 @@ const stateProps = (state: IState) => {
   const user: any = state.get('user');
   return {
     loading: user.get('loading') || false,
-    resetPasswordSuccess: user.get('resetPasswordSuccess') || false
+    resetPasswordSuccess: user.get('resetPasswordSuccess') || true,
+    resetPasswordRedirectUri: user.get('resetPasswordRedirectUri') || "",
   };
 };
 
@@ -45,7 +46,14 @@ export class ResetPasswordPage extends React.PureComponent<Props, undefined> {
         <Card className="login-container relative-center" title={<div className="login-title">设置新密码</div>}>
           {
             this.props.resetPasswordSuccess?
-            <div className="login-title">重置密码成功！</div>
+            <div className="reset-password-success">
+              <div className="login-title">重置密码成功！</div>
+              <Button type="primary" onClick={()=>{
+                if (this.props.resetPasswordRedirectUri) {
+                  window.location.href= decodeURIComponent(this.props.resetPasswordRedirectUri)
+                }
+              }}>去登陆</Button>
+            </div>
             :
             <Form className="login-form">
               <FormItem>

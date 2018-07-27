@@ -26,7 +26,7 @@ export const reqResetPassword = createAction(types.RESET_PASSWORD_REQ, resolve =
 export const resResetPassword = createStandardAction(types.RESET_PASSWORD_RES)<IResponse>()
 
 export const reqResetPasswordToken = createAction(types.RESET_PASSWORD_TOKEN_REQ, resolve => {
-  return (account) => resolve({account});
+  return (account, redirect_uri) => resolve({account, redirect_uri});
 })
 
 export const resResetPasswordToken = createStandardAction(types.RESET_PASSWORD_TOKEN_RES)<IResponse>()

@@ -96,3 +96,12 @@ func RefreshToken(refresh string) (*Token, error) {
 	}
 	return token, nil
 }
+
+// GetToken 获取Token
+func GetToken(code string) (*Token, error) {
+	token, err := store.GetTokenByToken(code)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
+}
